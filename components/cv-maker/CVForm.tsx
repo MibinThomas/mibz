@@ -131,6 +131,9 @@ export default function CVForm() {
     <div className="space-y-3">
       {/* 1. PERSONAL DETAILS */}
       <AccordionItem id="personal" title="Personal Details" icon={User}>
+        {/* Hidden input to register profileImage with React Hook Form */}
+        <input type="hidden" {...register("personalInfo.profileImage")} />
+        
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row gap-5 items-center md:items-start pb-4 border-b border-brand-gray-800/40">
             {/* Image Uploader */}

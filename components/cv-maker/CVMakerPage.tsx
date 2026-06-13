@@ -266,7 +266,9 @@ export default function CVMakerPage() {
     const url = URL.createObjectURL(blob);
     const downloadAnchor = document.createElement("a");
     downloadAnchor.href = url;
-    downloadAnchor.download = `${watchedValues.personalInfo.fullName.replace(/\s+/g, "-") || "Untitled"}-ATS-CV.json`;
+    
+    const safeName = (watchedValues.personalInfo?.fullName || "Untitled").trim().replace(/\s+/g, "-");
+    downloadAnchor.download = `${safeName}-ATS-CV.json`;
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     document.body.removeChild(downloadAnchor);
@@ -420,7 +422,9 @@ export default function CVMakerPage() {
     const url = URL.createObjectURL(blob);
     const downloadAnchor = document.createElement("a");
     downloadAnchor.href = url;
-    downloadAnchor.download = `${watchedValues.personalInfo.fullName.replace(/\s+/g, "-") || "Untitled"}-ATS-CV.html`;
+    
+    const safeName = (watchedValues.personalInfo?.fullName || "Untitled").trim().replace(/\s+/g, "-");
+    downloadAnchor.download = `${safeName}-ATS-CV.html`;
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     document.body.removeChild(downloadAnchor);
