@@ -215,7 +215,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
                 <span>Contact Me</span>
               </Link>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/mibin-thomas/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-8 py-4 rounded-full bg-brand-gray-950 border border-brand-gray-850 text-white font-heading font-semibold text-sm hover:bg-brand-gray-900 transition-colors flex items-center gap-2"

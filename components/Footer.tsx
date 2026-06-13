@@ -64,7 +64,7 @@ export default function Footer() {
 
           <div className="flex items-center gap-4 pt-2">
             <a
-              href="https://linkedin.com"
+              href="https://www.linkedin.com/in/mibin-thomas/"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 rounded-full bg-brand-gray-800 hover:bg-brand-emerald hover:text-brand-dark transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brand-emerald"
