@@ -10,6 +10,7 @@ export const cvSchema = z.object({
     linkedinUrl: z.string().optional().or(z.literal("")),
     portfolioUrl: z.string().optional().or(z.literal("")),
     githubUrl: z.string().optional().or(z.literal("")),
+    profileImage: z.string().optional().or(z.literal("")),
   }),
   summary: z.string().min(10, "Summary must be at least 10 characters"),
   experience: z.array(

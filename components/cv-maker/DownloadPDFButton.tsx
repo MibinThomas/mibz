@@ -25,10 +25,10 @@ export default function DownloadPDFButton({
         <button
           type="button"
           disabled
-          className="h-10 px-3.5 rounded-lg bg-brand-card/30 border border-brand-gray-800/80 text-brand-gray-500 transition-all text-xs font-semibold flex items-center justify-center gap-1.5 cursor-not-allowed"
+          className="h-10 px-3.5 rounded-xl bg-brand-card/20 border border-white/5 text-brand-gray-650 transition-all text-xs font-medium flex items-center justify-center gap-1.5 cursor-not-allowed"
           title="Setup Neon DATABASE_URL or Supabase credentials in .env.local to enable real-time database syncing"
         >
-          <Cloud className="w-4 h-4 text-brand-gray-600" />
+          <Cloud className="w-4 h-4 text-brand-gray-800" />
           <span>Sync (Local)</span>
         </button>
       );
@@ -56,7 +56,7 @@ export default function DownloadPDFButton({
         type="button"
         onClick={onCloudSync}
         disabled={cloudSyncStatus === "syncing"}
-        className={`h-10 px-3.5 rounded-lg border transition-all text-xs font-semibold flex items-center justify-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-brand-emerald ${buttonClass}`}
+        className={`h-10 px-3.5 rounded-xl border transition-all text-xs font-semibold flex items-center justify-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-brand-emerald hover:scale-[1.02] active:scale-[0.98] ${buttonClass}`}
         title="Sync and backup this CV draft dynamically in Neon / Supabase database"
       >
         {icon}
@@ -71,7 +71,7 @@ export default function DownloadPDFButton({
       <button
         type="button"
         onClick={onPrint}
-        className="h-10 px-4 rounded-lg bg-gradient-to-r from-brand-emerald to-brand-blue text-brand-dark hover:opacity-95 transition-all font-heading font-semibold text-sm flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.35)]"
+        className="h-10 px-4.5 rounded-xl bg-gradient-to-r from-brand-emerald to-brand-blue text-brand-dark hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all font-heading font-bold text-xs flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.3)]"
       >
         <Printer className="w-4 h-4" />
         <span>Print & Save PDF</span>
@@ -84,7 +84,7 @@ export default function DownloadPDFButton({
       <button
         type="button"
         onClick={onExportHTML}
-        className="h-10 px-3.5 rounded-lg bg-brand-card hover:bg-brand-gray-900 border border-brand-gray-800 text-brand-gray-300 hover:text-white transition-all text-xs font-semibold flex items-center justify-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-brand-emerald"
+        className="h-10 px-3.5 rounded-xl bg-brand-card/40 hover:bg-brand-card/70 border border-white/5 text-brand-gray-300 hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all text-xs font-semibold flex items-center justify-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-brand-emerald"
         title="Download your CV as a standalone, styled HTML document"
       >
         <FileCode className="w-4 h-4 text-brand-emerald" />
@@ -95,7 +95,7 @@ export default function DownloadPDFButton({
       <button
         type="button"
         onClick={onExportJSON}
-        className="h-10 px-3.5 rounded-lg bg-brand-card hover:bg-brand-gray-900 border border-brand-gray-800 text-brand-gray-300 hover:text-white transition-all text-xs font-semibold flex items-center justify-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-brand-emerald"
+        className="h-10 px-3.5 rounded-xl bg-brand-card/40 hover:bg-brand-card/70 border border-white/5 text-brand-gray-300 hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all text-xs font-semibold flex items-center justify-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-brand-emerald"
         title="Backup your data as a JSON file to import later"
       >
         <FileJson className="w-4 h-4 text-brand-gray-400" />

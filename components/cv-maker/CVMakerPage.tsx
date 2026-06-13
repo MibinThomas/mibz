@@ -490,47 +490,51 @@ export default function CVMakerPage() {
             
             {appMode === "initial" && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
-                className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 py-6"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 py-8"
               >
                 {/* Upload Existing CV Card */}
                 <div
                   onClick={() => setAppMode("upload")}
-                  className="bg-brand-card border border-brand-gray-800 hover:border-brand-emerald/30 rounded-2xl p-8 text-center transition-all cursor-pointer group hover:bg-brand-card/80 hover:shadow-[0_0_35px_rgba(16,185,129,0.08)] relative overflow-hidden"
+                  className="bg-brand-card/30 backdrop-blur-md border border-white/5 hover:border-brand-emerald/30 rounded-2xl p-8 text-center transition-all cursor-pointer group hover:bg-brand-card/50 hover:shadow-[0_0_40px_rgba(16,185,129,0.08)] relative overflow-hidden flex flex-col items-center justify-between min-h-[300px]"
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-brand-emerald/5 blur-[25px] rounded-full pointer-events-none"></div>
-                  <div className="p-4 rounded-xl border border-brand-gray-800 bg-brand-dark mb-5 text-brand-emerald mx-auto w-14 h-14 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                    <UploadCloud className="w-6 h-6" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-brand-emerald/5 blur-[35px] rounded-full pointer-events-none transition-transform duration-500 group-hover:scale-125"></div>
+                  <div className="w-full flex flex-col items-center">
+                    <div className="p-4 rounded-2xl border border-white/5 bg-brand-dark/80 mb-5 text-brand-emerald mx-auto w-14 h-14 flex items-center justify-center group-hover:scale-110 group-hover:border-brand-emerald/30 transition-all duration-300 shadow-inner">
+                      <UploadCloud className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2 tracking-tight">Upload Existing CV</h3>
+                    <p className="text-xs text-brand-gray-400 leading-relaxed max-w-[240px]">
+                      Convert your current resume file (PDF, DOCX, DOC, or TXT) into a cleaner parser-safe structure in seconds.
+                    </p>
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Upload Existing CV</h3>
-                  <p className="text-xs text-brand-gray-400 leading-relaxed">
-                    Convert your current resume file (PDF, DOCX, DOC, or TXT) into a cleaner parser-safe structure in seconds.
-                  </p>
-                  <div className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-brand-emerald group-hover:underline">
+                  <div className="mt-6 inline-flex items-center gap-1.5 text-xs font-bold text-brand-emerald">
                     <span>Convert CV</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
 
                 {/* Create From Scratch Card */}
                 <div
                   onClick={handleCreateFromScratch}
-                  className="bg-brand-card border border-brand-gray-800 hover:border-brand-blue/30 rounded-2xl p-8 text-center transition-all cursor-pointer group hover:bg-brand-card/80 hover:shadow-[0_0_35px_rgba(59,130,246,0.08)] relative overflow-hidden"
+                  className="bg-brand-card/30 backdrop-blur-md border border-white/5 hover:border-brand-blue/30 rounded-2xl p-8 text-center transition-all cursor-pointer group hover:bg-brand-card/50 hover:shadow-[0_0_40px_rgba(59,130,246,0.08)] relative overflow-hidden flex flex-col items-center justify-between min-h-[300px]"
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-brand-blue/5 blur-[25px] rounded-full pointer-events-none"></div>
-                  <div className="p-4 rounded-xl border border-brand-gray-800 bg-brand-dark mb-5 text-brand-blue mx-auto w-14 h-14 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                    <FileEdit className="w-6 h-6" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-brand-blue/5 blur-[35px] rounded-full pointer-events-none transition-transform duration-500 group-hover:scale-125"></div>
+                  <div className="w-full flex flex-col items-center">
+                    <div className="p-4 rounded-2xl border border-white/5 bg-brand-dark/80 mb-5 text-brand-blue mx-auto w-14 h-14 flex items-center justify-center group-hover:scale-110 group-hover:border-brand-blue/30 transition-all duration-300 shadow-inner">
+                      <FileEdit className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2 tracking-tight">Create from Scratch</h3>
+                    <p className="text-xs text-brand-gray-400 leading-relaxed max-w-[240px]">
+                      Build a professional CV step-by-step using our interactive checklists. Pre-loads template guides.
+                    </p>
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Create from Scratch</h3>
-                  <p className="text-xs text-brand-gray-400 leading-relaxed">
-                    Build a professional CV step-by-step using our interactive checklists. Pre-loads template guides.
-                  </p>
-                  <div className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-brand-blue group-hover:underline">
+                  <div className="mt-6 inline-flex items-center gap-1.5 text-xs font-bold text-brand-blue">
                     <span>Start Building</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </motion.div>
@@ -547,69 +551,73 @@ export default function CVMakerPage() {
             {/* 4. WORKSPACE DASHBOARD */}
             {appMode === "workspace" && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
                 className="space-y-6"
               >
                 
                 {/* TOOLBAR/CONTROL PANEL */}
-                <div className="bg-brand-card/50 border border-brand-gray-800 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="bg-brand-card/30 backdrop-blur-md border border-white/5 shadow-lg rounded-2xl p-5 flex flex-col lg:flex-row items-center justify-between gap-5 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-brand-emerald/5 via-transparent to-brand-blue/5 pointer-events-none" />
                   
                   {/* Draft autosave and general actions */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto relative z-10">
                     <div className="text-left">
-                      <h2 className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <h2 className="text-xs font-bold text-white flex items-center gap-2 tracking-wider uppercase">
                         CV Builder Workspace
-                        <span className="w-1.5 h-1.5 rounded-full bg-brand-emerald animate-pulse"></span>
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-emerald opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-emerald"></span>
+                        </span>
                       </h2>
                       
-                      <div className="text-[10px] font-mono text-brand-gray-400 flex items-center gap-2 mt-0.5">
+                      <div className="text-[10px] font-mono text-brand-gray-400 flex items-center gap-2 mt-1">
                         {saveStatus === "saving" && (
-                          <span className="text-brand-blue flex items-center gap-1">
-                            <RefreshCw className="w-3 h-3 animate-spin" /> Auto-saving...
+                          <span className="text-brand-blue flex items-center gap-1.5 font-semibold">
+                            <RefreshCw className="w-3 h-3 animate-spin text-brand-blue" /> Auto-saving...
                           </span>
                         )}
                         {saveStatus === "saved" && (
-                          <span className="text-brand-emerald flex items-center gap-1">
-                            <Check className="w-3 h-3" /> Stored locally
+                          <span className="text-brand-emerald flex items-center gap-1.5 font-semibold">
+                            <Check className="w-3 h-3 text-brand-emerald" /> Stored locally
                           </span>
                         )}
                         {saveStatus === "idle" && (
-                          <span className="text-brand-gray-500">Draft saved</span>
+                          <span className="text-brand-gray-500 font-medium">Draft saved</span>
                         )}
                       </div>
                     </div>
 
-                    <div className="h-4 w-px bg-brand-gray-800 hidden sm:block"></div>
+                    <div className="h-6 w-px bg-white/10 hidden sm:block"></div>
 
                     {/* Return upload gateways */}
-                    <div className="relative">
+                    <div className="relative w-full sm:w-auto">
                       <button
                         type="button"
                         onClick={() => setShowUploadAnotherConfirm(!showUploadAnotherConfirm)}
-                        className="px-3 py-1.5 rounded-md border border-brand-gray-800 bg-brand-dark hover:bg-brand-card text-[11px] text-brand-gray-300 hover:text-white transition-colors"
+                        className="w-full sm:w-auto px-3.5 py-2 rounded-xl border border-white/5 bg-brand-card/40 hover:bg-brand-card/70 text-xs text-brand-gray-300 hover:text-white transition-all shadow-sm flex items-center justify-center gap-1.5 font-semibold hover:scale-[1.02] active:scale-[0.98]"
                       >
                         Upload Another CV
                       </button>
 
                       {showUploadAnotherConfirm && (
-                        <div className="absolute left-0 top-10 w-56 bg-brand-dark border border-brand-gray-800 rounded-xl p-3 shadow-2xl z-20 space-y-3">
-                          <p className="text-[10px] text-brand-gray-300 leading-normal">
+                        <div className="absolute left-0 top-12 w-64 bg-brand-card border border-white/10 rounded-2xl p-4 shadow-2xl z-20 space-y-3 backdrop-blur-lg">
+                          <p className="text-xs text-brand-gray-300 leading-normal">
                             Uploading another CV will clear your active workspace data. Are you sure?
                           </p>
                           <div className="flex gap-2 justify-end">
                             <button
                               type="button"
                               onClick={() => setShowUploadAnotherConfirm(false)}
-                              className="px-2 py-0.5 rounded bg-brand-card text-[10px] text-brand-gray-400 hover:text-white"
+                              className="px-3 py-1 rounded-lg bg-white/5 text-[10px] text-brand-gray-400 hover:text-white transition-colors"
                             >
                               Cancel
                             </button>
                             <button
                               type="button"
                               onClick={handleUploadAnother}
-                              className="px-2 py-0.5 rounded bg-brand-emerald text-brand-dark text-[10px] font-bold"
+                              className="px-3 py-1 rounded-lg bg-red-500 hover:bg-red-650 text-white text-[10px] font-bold transition-colors"
                             >
                               Confirm
                             </button>
@@ -620,9 +628,9 @@ export default function CVMakerPage() {
                   </div>
 
                   {/* Actions buttons panel */}
-                  <div className="flex flex-wrap items-center justify-end gap-2.5 w-full md:w-auto">
+                  <div className="flex flex-wrap items-center justify-end gap-2.5 w-full lg:w-auto relative z-10">
                     {/* Backup importer */}
-                    <label className="h-10 px-3.5 rounded-lg bg-brand-dark hover:bg-brand-card border border-brand-gray-800 text-brand-gray-300 hover:text-white transition-all text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
+                    <label className="h-10 px-4 rounded-xl bg-brand-card/40 hover:bg-brand-card/70 border border-white/5 text-brand-gray-300 hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
                       <Undo className="w-4 h-4 text-brand-gray-400 rotate-90" />
                       <span>Import JSON</span>
                       <input
@@ -647,29 +655,29 @@ export default function CVMakerPage() {
                       <button
                         type="button"
                         onClick={() => setShowResetConfirm(!showResetConfirm)}
-                        className="h-10 px-3.5 rounded-lg border border-brand-gray-800 bg-brand-dark text-brand-gray-400 hover:text-white text-xs font-semibold"
+                        className="h-10 px-4 rounded-xl border border-white/5 bg-brand-card/40 text-brand-gray-400 hover:text-white text-xs font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all hover:bg-brand-card/70"
                         title="Reset to sample templates"
                       >
                         Reset Changes
                       </button>
                       
                       {showResetConfirm && (
-                        <div className="absolute right-0 top-12 w-52 bg-brand-dark border border-brand-gray-800 rounded-xl p-3 shadow-2xl z-20 space-y-3">
-                          <p className="text-[10px] text-brand-gray-300 leading-normal">
+                        <div className="absolute right-0 top-12 w-56 bg-brand-card border border-white/10 rounded-2xl p-4 shadow-2xl z-20 space-y-3 backdrop-blur-lg">
+                          <p className="text-xs text-brand-gray-300 leading-normal">
                             Reset all details to the sample resume data?
                           </p>
                           <div className="flex gap-2 justify-end">
                             <button
                               type="button"
                               onClick={() => setShowResetConfirm(false)}
-                              className="px-2 py-0.5 rounded bg-brand-card text-[10px] text-brand-gray-400"
+                              className="px-3 py-1 rounded-lg bg-white/5 text-[10px] text-brand-gray-400 hover:text-white transition-colors"
                             >
                               Cancel
                             </button>
                             <button
                               type="button"
                               onClick={handleReset}
-                              className="px-2 py-0.5 rounded bg-brand-blue text-white text-[10px]"
+                              className="px-3 py-1 rounded-lg bg-brand-blue hover:bg-blue-600 text-white text-[10px] font-semibold transition-colors"
                             >
                               Reset
                             </button>
@@ -683,29 +691,29 @@ export default function CVMakerPage() {
                       <button
                         type="button"
                         onClick={() => setShowClearConfirm(!showClearConfirm)}
-                        className="h-10 px-3.5 rounded-lg border border-red-500/10 bg-red-500/5 hover:bg-red-500/15 text-red-400 transition-colors flex items-center justify-center gap-1.5 text-xs font-semibold"
+                        className="h-10 px-4 rounded-xl border border-red-500/15 bg-red-500/5 hover:bg-red-500/10 text-red-400 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 text-xs font-semibold"
                       >
                         <Trash2 className="w-4 h-4" />
                         <span>Clear All</span>
                       </button>
 
                       {showClearConfirm && (
-                        <div className="absolute right-0 top-12 w-52 bg-brand-dark border border-brand-gray-800 rounded-xl p-3 shadow-2xl z-20 space-y-3">
-                          <p className="text-[10px] text-brand-gray-300 leading-normal">
+                        <div className="absolute right-0 top-12 w-56 bg-brand-card border border-white/10 rounded-2xl p-4 shadow-2xl z-20 space-y-3 backdrop-blur-lg">
+                          <p className="text-xs text-brand-gray-300 leading-normal">
                             Are you sure you want to clear all CV fields? This draft will be deleted.
                           </p>
                           <div className="flex gap-2 justify-end">
                             <button
                               type="button"
                               onClick={() => setShowClearConfirm(false)}
-                              className="px-2 py-0.5 rounded bg-brand-card text-[10px] text-brand-gray-400"
+                              className="px-3 py-1 rounded-lg bg-white/5 text-[10px] text-brand-gray-400 hover:text-white transition-colors"
                             >
                               Cancel
                             </button>
                             <button
                               type="button"
                               onClick={handleClearAll}
-                              className="px-2 py-0.5 rounded bg-red-500 text-brand-dark text-[10px] font-bold"
+                              className="px-3 py-1 rounded-lg bg-red-500 hover:bg-red-600 text-white text-[10px] font-bold transition-colors"
                             >
                               Clear
                             </button>
@@ -718,21 +726,23 @@ export default function CVMakerPage() {
 
                 {/* Cloud Sync active share banner */}
                 {dbConfigured && syncId && (
-                  <div className="bg-brand-card/45 border border-brand-gray-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                    <div className="space-y-0.5 text-left w-full">
-                      <span className="font-semibold text-white block">
+                  <div className="bg-brand-card/30 backdrop-blur-md border border-white/5 shadow-md rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-brand-emerald/5 to-transparent pointer-events-none" />
+                    
+                    <div className="space-y-1 text-left w-full relative z-10">
+                      <span className="font-bold text-white text-sm flex items-center gap-2">
                         {cloudSyncStatus === "synced" ? "🚀 Cloud Synchronization Active" : "☁️ Real-time Cloud Backups Enabled"}
                       </span>
-                      <span className="text-brand-gray-400 block leading-normal">
-                        Your CV draft sync token: <code className="text-brand-emerald bg-brand-dark px-1.5 py-0.5 rounded font-mono font-semibold">{syncId}</code>. 
+                      <p className="text-brand-gray-400 leading-relaxed max-w-2xl">
+                        Your CV draft sync token: <code className="text-brand-emerald bg-brand-dark/80 border border-white/5 px-2 py-0.5 rounded-lg font-mono font-bold text-[11px]">{syncId}</code>. 
                         {cloudSyncStatus === "synced" 
                           ? "Retrieve or edit it on any browser using the sharing link below:" 
                           : "Save your work to the database to generate a unique sharing link."}
-                      </span>
+                      </p>
                       {cloudSyncStatus === "synced" && (
-                        <span className="text-brand-blue block mt-1 break-all select-all font-mono font-medium underline">
+                        <div className="bg-brand-dark/70 border border-white/5 px-3 py-2 rounded-xl text-brand-blue hover:text-brand-blue/80 transition-colors flex items-center gap-2 break-all select-all font-mono font-medium mt-2 w-full sm:w-auto">
                           {typeof window !== "undefined" ? `${window.location.origin}/cv-maker?syncId=${syncId}` : ""}
-                        </span>
+                        </div>
                       )}
                     </div>
                     {cloudSyncStatus === "synced" && (
@@ -743,7 +753,7 @@ export default function CVMakerPage() {
                           navigator.clipboard.writeText(shareUrl);
                           alert("Sharing URL copied to clipboard!");
                         }}
-                        className="w-full sm:w-auto h-8 px-3 rounded bg-brand-emerald text-brand-dark font-heading font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 flex-shrink-0"
+                        className="w-full sm:w-auto h-9 px-4 rounded-xl bg-gradient-to-r from-brand-emerald to-brand-blue hover:opacity-90 text-brand-dark font-heading font-bold transition-opacity flex items-center justify-center gap-1.5 flex-shrink-0 relative z-10"
                       >
                         Copy Link
                       </button>
@@ -753,37 +763,45 @@ export default function CVMakerPage() {
 
                 {/* Sync error banner */}
                 {cloudSyncError && (
-                  <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 text-xs text-red-400">
+                  <div className="bg-red-500/5 border border-red-500/15 backdrop-blur-sm rounded-2xl p-4 text-xs text-red-400 flex items-center gap-2.5">
                     ⚠️ <strong>Database sync failed:</strong> {cloudSyncError}
                   </div>
                 )}
 
                 {/* MOBILE VIEW NAVIGATION TABS */}
-                <div className="lg:hidden flex border-b border-brand-gray-800">
+                <div className="lg:hidden flex p-1 bg-brand-card/60 backdrop-blur-md border border-white/5 rounded-2xl relative my-3">
                   <button
+                    type="button"
                     onClick={() => setMobileTab("edit")}
-                    className={`flex-1 py-3 text-xs font-bold border-b-2 transition-all ${
-                      mobileTab === "edit" ? "border-brand-emerald text-white bg-brand-card/20" : "border-transparent text-brand-gray-400"
-                    }`}
+                    className="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all relative z-10 text-center focus:outline-none"
                   >
-                    Edit Form
+                    <span className={mobileTab === "edit" ? "text-brand-emerald font-extrabold transition-all" : "text-brand-gray-400 transition-all"}>Edit Form</span>
                   </button>
                   <button
+                    type="button"
                     onClick={() => setMobileTab("preview")}
-                    className={`flex-1 py-3 text-xs font-bold border-b-2 transition-all ${
-                      mobileTab === "preview" ? "border-brand-emerald text-white bg-brand-card/20" : "border-transparent text-brand-gray-400"
-                    }`}
+                    className="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all relative z-10 text-center focus:outline-none"
                   >
-                    Live Preview
+                    <span className={mobileTab === "preview" ? "text-brand-emerald font-extrabold transition-all" : "text-brand-gray-400 transition-all"}>Live Preview</span>
                   </button>
                   <button
+                    type="button"
                     onClick={() => setMobileTab("ats")}
-                    className={`flex-1 py-3 text-xs font-bold border-b-2 transition-all ${
-                      mobileTab === "ats" ? "border-brand-emerald text-white bg-brand-card/20" : "border-transparent text-brand-gray-400"
-                    }`}
+                    className="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all relative z-10 text-center focus:outline-none"
                   >
-                    ATS Score
+                    <span className={mobileTab === "ats" ? "text-brand-emerald font-extrabold transition-all" : "text-brand-gray-400 transition-all"}>ATS Score</span>
                   </button>
+                  
+                  {/* Sliding Highlight Pill */}
+                  <motion.div
+                    className="absolute top-1 bottom-1 rounded-xl bg-brand-emerald/10 border border-brand-emerald/25 -z-0"
+                    initial={false}
+                    animate={{
+                      left: mobileTab === "edit" ? "4px" : mobileTab === "preview" ? "calc(33.33% + 2px)" : "calc(66.66% + 2px)",
+                      width: "calc(33.33% - 6px)",
+                    }}
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
                 </div>
 
                 {/* WORKSPACE CONTENT GRID */}

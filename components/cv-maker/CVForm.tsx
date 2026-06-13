@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useFormContext } from "react-hook-form";
-import { User, FileText, ChevronDown, AlertCircle, Briefcase, GraduationCap, Tag, FolderGit, Award, Languages } from "lucide-react";
+import { User, FileText, ChevronDown, AlertCircle, Briefcase, GraduationCap, Tag, FolderGit, Award, Languages, Camera, X } from "lucide-react";
 import { CVFormValues } from "../../lib/cvSchema";
 import ExperienceForm from "./ExperienceForm";
 import EducationForm from "./EducationForm";
@@ -11,9 +11,61 @@ import LanguageForm from "./LanguageForm";
 import CustomSectionForm from "./CustomSectionForm";
 
 export default function CVForm() {
-  const { register, formState: { errors } } = useFormContext<CVFormValues>();
+  const { register, watch, setValue, formState: { errors } } = useFormContext<CVFormValues>();
+  const profileImage = watch("personalInfo.profileImage");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [activeSection, setActiveSection] = useState<string>("personal");
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file (PNG, JPG, or WEBP).");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new globalThis.Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const MAX_WIDTH = 250;
+        const MAX_HEIGHT = 250;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+        setValue("personalInfo.profileImage", compressedBase64);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setValue("personalInfo.profileImage", "");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const toggleSection = (section: string) => {
     setActiveSection(activeSection === section ? "" : section);
@@ -80,35 +132,84 @@ export default function CVForm() {
       {/* 1. PERSONAL DETAILS */}
       <AccordionItem id="personal" title="Personal Details" icon={User}>
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-brand-gray-300 mb-1.5">
-                Full Name *
+          <div className="flex flex-col md:flex-row gap-5 items-center md:items-start pb-4 border-b border-brand-gray-800/40">
+            {/* Image Uploader */}
+            <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+              <label className="block text-[11px] font-bold text-brand-gray-300">
+                Profile Photo
               </label>
-              <input
-                type="text"
-                placeholder="e.g. Mibin Thomas"
-                {...register("personalInfo.fullName")}
-                className="w-full px-3 py-2 bg-brand-dark border border-brand-gray-800 focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald text-white rounded-md text-sm outline-none transition-all"
-              />
-              {errors.personalInfo?.fullName && (
-                <p className="text-red-500 text-xs mt-1">{errors.personalInfo.fullName.message}</p>
-              )}
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="relative group w-20 h-20 rounded-full border-2 border-dashed border-brand-gray-800 hover:border-brand-emerald bg-brand-dark/50 flex flex-col items-center justify-center overflow-hidden cursor-pointer transition-all"
+                title="Upload profile image"
+              >
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  accept="image/*" 
+                  onChange={handleImageChange} 
+                  className="hidden" 
+                />
+                {profileImage ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                      src={profileImage} 
+                      alt="Profile Preview" 
+                      className="w-full h-full object-cover" 
+                    />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                      <Camera className="w-4 h-4 text-white" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="absolute top-0 right-0 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors z-10"
+                      title="Remove image"
+                    >
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-brand-gray-400 group-hover:text-brand-emerald transition-colors">
+                    <Camera className="w-4 h-4 mb-0.5" />
+                    <span className="text-[9px] font-semibold">Upload</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-brand-gray-300 mb-1.5">
-                Job Title / Profession *
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. E-Commerce Specialist"
-                {...register("personalInfo.jobTitle")}
-                className="w-full px-3 py-2 bg-brand-dark border border-brand-gray-800 focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald text-white rounded-md text-sm outline-none transition-all"
-              />
-              {errors.personalInfo?.jobTitle && (
-                <p className="text-red-500 text-xs mt-1">{errors.personalInfo.jobTitle.message}</p>
-              )}
+            {/* Grid fields */}
+            <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+              <div>
+                <label className="block text-xs font-semibold text-brand-gray-300 mb-1.5">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Mibin Thomas"
+                  {...register("personalInfo.fullName")}
+                  className="w-full px-3 py-2 bg-brand-dark border border-brand-gray-800 focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald text-white rounded-md text-sm outline-none transition-all"
+                />
+                {errors.personalInfo?.fullName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.personalInfo.fullName.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-brand-gray-300 mb-1.5">
+                  Job Title / Profession *
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. E-Commerce Specialist"
+                  {...register("personalInfo.jobTitle")}
+                  className="w-full px-3 py-2 bg-brand-dark border border-brand-gray-800 focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald text-white rounded-md text-sm outline-none transition-all"
+                />
+                {errors.personalInfo?.jobTitle && (
+                  <p className="text-red-500 text-xs mt-1">{errors.personalInfo.jobTitle.message}</p>
+                )}
+              </div>
             </div>
           </div>
 

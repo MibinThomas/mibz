@@ -150,6 +150,16 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
           {/* 1. Classic Professional: Centered Profile */}
           {templateId === "classic" && (
             <div className="text-center space-y-2">
+              {data.personalInfo.profileImage && (
+                <div className="flex justify-center mb-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src={data.personalInfo.profileImage} 
+                    alt="Profile" 
+                    className="w-20 h-20 rounded-full object-cover border border-brand-gray-300 shadow-sm" 
+                  />
+                </div>
+              )}
               <h1 className={`${sizeClasses.h1} font-bold tracking-tight text-black`}>
                 {data.personalInfo.fullName || "Your Full Name"}
               </h1>
@@ -178,13 +188,23 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
 
           {/* 2. Modern Minimal: Left Aligned Modern */}
           {templateId === "minimal" && (
-            <div className="border-b border-brand-gray-300 pb-4 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-              <div className="space-y-1">
-                <h1 className={`${sizeClasses.h1} font-bold tracking-tight text-black`}>
-                  {data.personalInfo.fullName || "Your Full Name"}
-                </h1>
-                <div className="text-sm font-semibold tracking-wide" style={{ color: accentColorHex }}>
-                  {data.personalInfo.jobTitle || "Job Title / Profession"}
+            <div className="border-b border-brand-gray-300 pb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-4">
+                {data.personalInfo.profileImage && (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img 
+                    src={data.personalInfo.profileImage} 
+                    alt="Profile" 
+                    className="w-16 h-16 rounded-full object-cover border border-brand-gray-300 flex-shrink-0" 
+                  />
+                )}
+                <div className="space-y-1">
+                  <h1 className={`${sizeClasses.h1} font-bold tracking-tight text-black`}>
+                    {data.personalInfo.fullName || "Your Full Name"}
+                  </h1>
+                  <div className="text-sm font-semibold tracking-wide" style={{ color: accentColorHex }}>
+                    {data.personalInfo.jobTitle || "Job Title / Profession"}
+                  </div>
                 </div>
               </div>
               <div className="text-xs text-brand-gray-650 space-y-0.5 md:text-right">
@@ -208,13 +228,24 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
           {templateId === "executive" && (
             <div className="space-y-3 pb-3 border-b-2" style={{ borderColor: accentColorHex }}>
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                <div className="space-y-1.5">
-                  <h1 className={`${sizeClasses.h1} font-bold text-black uppercase tracking-wide`}>
-                    {data.personalInfo.fullName || "Your Full Name"}
-                  </h1>
-                  <h2 className="text-xs uppercase tracking-widest font-semibold text-brand-gray-650">
-                    {data.personalInfo.jobTitle || "Job Title / Profession"}
-                  </h2>
+                <div className="flex gap-4 items-start">
+                  {data.personalInfo.profileImage && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img 
+                      src={data.personalInfo.profileImage} 
+                      alt="Profile" 
+                      className="w-16 h-16 rounded-lg object-cover border-2 flex-shrink-0" 
+                      style={{ borderColor: accentColorHex }}
+                    />
+                  )}
+                  <div className="space-y-1.5">
+                    <h1 className={`${sizeClasses.h1} font-bold text-black uppercase tracking-wide`}>
+                      {data.personalInfo.fullName || "Your Full Name"}
+                    </h1>
+                    <h2 className="text-xs uppercase tracking-widest font-semibold text-brand-gray-650">
+                      {data.personalInfo.jobTitle || "Job Title / Profession"}
+                    </h2>
+                  </div>
                 </div>
                 <div className="text-xs text-brand-gray-600 md:text-right space-y-1">
                   {data.personalInfo.email && <div>Email: <span className="font-semibold text-black">{data.personalInfo.email}</span></div>}
@@ -236,28 +267,43 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
           {/* 4. Developer Focused: Technical Profile header */}
           {templateId === "developer" && (
             <div className="border-b border-brand-gray-300 pb-4 space-y-2">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-                <h1 className={`${sizeClasses.h1} font-extrabold tracking-tight text-black`}>
-                  {data.personalInfo.fullName || "Your Full Name"}
-                </h1>
-                <div className="flex flex-wrap gap-x-2 text-xs font-mono text-brand-gray-600">
-                  {data.personalInfo.email && <span>{data.personalInfo.email}</span>}
-                  {data.personalInfo.phone && <span>| {data.personalInfo.phone}</span>}
+              <div className="flex justify-between items-start gap-4">
+                <div className="space-y-2 flex-grow">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                    <h1 className={`${sizeClasses.h1} font-extrabold tracking-tight text-black`}>
+                      {data.personalInfo.fullName || "Your Full Name"}
+                    </h1>
+                    <div className="flex flex-wrap gap-x-2 text-xs font-mono text-brand-gray-600">
+                      {data.personalInfo.email && <span>{data.personalInfo.email}</span>}
+                      {data.personalInfo.phone && <span>| {data.personalInfo.phone}</span>}
+                    </div>
+                  </div>
+                  <div className="text-xs font-semibold uppercase tracking-wider text-brand-gray-650 flex flex-wrap gap-x-3 items-center">
+                    <span className="text-sm font-bold" style={{ color: accentColorHex }}>{data.personalInfo.jobTitle || "Job Title"}</span>
+                    {data.personalInfo.location && <span>• {data.personalInfo.location}</span>}
+                  </div>
+                  <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-brand-gray-650 font-mono">
+                    {data.personalInfo.linkedinUrl && (
+                      <span>[LinkedIn: <span className="underline">{data.personalInfo.linkedinUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>]</span>
+                    )}
+                    {data.personalInfo.portfolioUrl && (
+                      <span>[Portfolio: <span className="underline">{data.personalInfo.portfolioUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>]</span>
+                    )}
+                    {data.personalInfo.githubUrl && (
+                      <span>[GitHub: <span className="underline">{data.personalInfo.githubUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>]</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-brand-gray-650 flex flex-wrap gap-x-3 items-center">
-                <span className="text-sm font-bold" style={{ color: accentColorHex }}>{data.personalInfo.jobTitle || "Job Title"}</span>
-                {data.personalInfo.location && <span>• {data.personalInfo.location}</span>}
-              </div>
-              <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-brand-gray-650 font-mono">
-                {data.personalInfo.linkedinUrl && (
-                  <span>[LinkedIn: <span className="underline">{data.personalInfo.linkedinUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>]</span>
-                )}
-                {data.personalInfo.portfolioUrl && (
-                  <span>[Portfolio: <span className="underline">{data.personalInfo.portfolioUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>]</span>
-                )}
-                {data.personalInfo.githubUrl && (
-                  <span>[GitHub: <span className="underline">{data.personalInfo.githubUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>]</span>
+                {data.personalInfo.profileImage && (
+                  <div className="p-1 border border-brand-gray-350 font-mono text-[9px] flex flex-col items-center gap-1 flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                      src={data.personalInfo.profileImage} 
+                      alt="Avatar" 
+                      className="w-16 h-16 object-cover border border-brand-gray-300" 
+                    />
+                    <span>[AVATAR]</span>
+                  </div>
                 )}
               </div>
             </div>
@@ -266,19 +312,32 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
           {/* 5. Marketing Specialist: Elegant large spacing */}
           {templateId === "marketing" && (
             <div className="space-y-2 pb-4 border-b border-brand-gray-300">
-              <h1 className={`${sizeClasses.h1} font-extrabold tracking-tight text-black text-left`}>
-                {data.personalInfo.fullName || "Your Full Name"}
-              </h1>
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-3">
-                <div className="text-sm font-semibold tracking-wide" style={{ color: accentColorHex }}>
-                  {data.personalInfo.jobTitle || "Job Title / Profession"}
-                </div>
-                <div className="text-xs text-brand-gray-600 md:text-right space-y-0.5 font-medium">
-                  {data.personalInfo.email && <div>{data.personalInfo.email}</div>}
-                  {data.personalInfo.phone && <div>{data.personalInfo.phone} • {data.personalInfo.location}</div>}
-                  {data.personalInfo.portfolioUrl && (
-                    <div className="underline text-black font-semibold">{data.personalInfo.portfolioUrl.replace(/^https?:\/\/(www\.)?/, "")}</div>
-                  )}
+              <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-start">
+                {data.personalInfo.profileImage && (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img 
+                    src={data.personalInfo.profileImage} 
+                    alt="Profile" 
+                    className="w-20 h-20 rounded-full object-cover border-2 shadow-sm flex-shrink-0" 
+                    style={{ borderColor: accentColorHex }}
+                  />
+                )}
+                <div className="flex-grow space-y-2 w-full">
+                  <h1 className={`${sizeClasses.h1} font-extrabold tracking-tight text-black text-left`}>
+                    {data.personalInfo.fullName || "Your Full Name"}
+                  </h1>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3">
+                    <div className="text-sm font-semibold tracking-wide" style={{ color: accentColorHex }}>
+                      {data.personalInfo.jobTitle || "Job Title / Profession"}
+                    </div>
+                    <div className="text-xs text-brand-gray-600 md:text-right space-y-0.5 font-medium">
+                      {data.personalInfo.email && <div>{data.personalInfo.email}</div>}
+                      {data.personalInfo.phone && <div>{data.personalInfo.phone} • {data.personalInfo.location}</div>}
+                      {data.personalInfo.portfolioUrl && (
+                        <div className="underline text-black font-semibold">{data.personalInfo.portfolioUrl.replace(/^https?:\/\/(www\.)?/, "")}</div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
