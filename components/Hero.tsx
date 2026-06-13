@@ -62,7 +62,6 @@ export default function Hero() {
       aria-label="Welcome"
     >
       {/* Background Gradients & Glows */}
-      <div className="absolute inset-0 bg-brand-dark -z-30" />
       <div className="absolute top-[20%] left-[-10%] w-[50%] aspect-square rounded-full bg-brand-emerald/5 blur-[120px] pointer-events-none -z-25" />
       <div className="absolute bottom-[20%] right-[-10%] w-[50%] aspect-square rounded-full bg-brand-blue/5 blur-[120px] pointer-events-none -z-25" />
 

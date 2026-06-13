@@ -71,7 +71,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="relative bg-[#050505] py-24 px-6 md:px-12 border-t border-brand-gray-900/40">
+    <section id="contact" className="relative bg-transparent py-24 px-6 md:px-12 border-t border-brand-gray-900/40">
       
       {/* Background visual overlay */}
       <div className="absolute bottom-0 left-0 w-[45%] aspect-square bg-brand-blue/2 blur-[130px] pointer-events-none -z-10" />

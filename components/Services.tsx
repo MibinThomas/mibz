@@ -40,7 +40,7 @@ const services = [
 
 export default function Services() {
   return (
-    <section id="services" className="relative bg-[#080808] py-24 px-6 md:px-12 border-t border-brand-gray-900/40">
+    <section id="services" className="relative bg-transparent py-24 px-6 md:px-12 border-t border-brand-gray-900/40">
       
       {/* Background radial overlay */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] aspect-square rounded-full bg-brand-emerald/2 blur-[150px] pointer-events-none -z-10" />

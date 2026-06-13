@@ -9,7 +9,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-brand-dark border-t border-brand-gray-800/60 py-16 px-6 md:px-12 relative overflow-hidden">
+    <footer className="bg-transparent border-t border-brand-gray-800/60 py-16 px-6 md:px-12 relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-px bg-gradient-to-r from-transparent via-brand-emerald/40 to-transparent"></div>
       
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 items-start">

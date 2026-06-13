@@ -90,7 +90,7 @@ export default function About({ onActiveIndexChange }: AboutProps) {
 
 
   return (
-    <section id="about" className="relative bg-brand-dark py-24 px-6 md:px-12 border-t border-brand-gray-900/40">
+    <section id="about" className="relative bg-transparent py-24 px-6 md:px-12 border-t border-brand-gray-900/40">
       
       {/* Sticky layout container */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16">

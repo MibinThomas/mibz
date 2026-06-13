@@ -59,7 +59,7 @@ export default function Stats() {
     <section
       id="results"
       ref={sectionRef}
-      className="relative bg-[#080808] py-24 px-6 md:px-12 border-t border-brand-gray-900/40"
+      className="relative bg-transparent py-24 px-6 md:px-12 border-t border-brand-gray-900/40"
     >
       <div className="max-w-7xl mx-auto space-y-20">
         

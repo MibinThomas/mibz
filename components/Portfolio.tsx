@@ -120,7 +120,7 @@ export default function Portfolio() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   return (
-    <section id="portfolio" className="relative bg-[#050505] py-24 px-6 md:px-12 border-t border-brand-gray-900/40">
+    <section id="portfolio" className="relative bg-transparent py-24 px-6 md:px-12 border-t border-brand-gray-900/40">
       
       {/* Background visual element */}
       <div className="absolute top-[20%] right-[10%] w-[40%] aspect-square rounded-full bg-brand-blue/3 blur-[120px] pointer-events-none -z-10" />
