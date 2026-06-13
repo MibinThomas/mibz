@@ -5,8 +5,9 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Sparkles, BookOpen, Trash2, Check, 
-  ArrowRight, Download, Eye, EyeOff, RefreshCw, Undo
+  Sparkles, Trash2, Check, 
+  ArrowRight, Eye, RefreshCw, Undo,
+  UploadCloud, FileEdit, FileDown
 } from "lucide-react";
 
 import Navbar from "@/components/Navbar";
@@ -14,7 +15,8 @@ import Footer from "@/components/Footer";
 import CVForm from "./CVForm";
 import CVPreview from "./CVPreview";
 import TemplateSelector from "./TemplateSelector";
-import ATSScore from "./ATSScore";
+import ATSScoreChecker from "./ATSScoreChecker";
+import CVUploadConverter from "./CVUploadConverter";
 import DownloadPDFButton from "./DownloadPDFButton";
 
 import { cvSchema, CVFormValues } from "../../lib/cvSchema";
@@ -51,10 +53,15 @@ const emptyCVData: CVData = {
 };
 
 export default function CVMakerPage() {
+  // Navigation & Gateway states: "initial" | "scratch" | "upload" | "workspace"
+  const [appMode, setAppMode] = useState<"initial" | "upload" | "workspace">("initial");
   const [styleConfig, setStyleConfig] = useState<CVStyleConfig>(defaultStyleConfig);
-  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"edit" | "preview" | "ats">("edit");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saved" | "saving">("idle");
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showUploadAnotherConfirm, setShowUploadAnotherConfirm] = useState(false);
+  const [highlightMissing, setHighlightMissing] = useState(false);
   
   // Database cloud sync states
   const [dbConfigured, setDbConfigured] = useState(false);
@@ -73,9 +80,9 @@ export default function CVMakerPage() {
 
   const { reset, watch } = methods;
   
-  // Watch all values to feed directly to live preview and ATSScore
+  // Watch all values to feed directly to live preview and ATSScoreChecker
   const watchedValues = watch() as CVData;
-
+  
   // 1. Check DB configuration status and load sync ID on mount
   useEffect(() => {
     async function checkDb() {
@@ -106,6 +113,7 @@ export default function CVMakerPage() {
                 setSyncId(urlSyncId);
                 localStorage.setItem("mibz-cv-sync-id", urlSyncId);
                 setCloudSyncStatus("synced");
+                setAppMode("workspace");
               }
             } else {
               setCloudSyncStatus("error");
@@ -120,11 +128,11 @@ export default function CVMakerPage() {
     checkDb();
   }, [reset]);
 
-  // Load initial draft from localStorage if it exists
+  // Load initial draft from localStorage if it exists and we aren't fetching a cloud resume
   useEffect(() => {
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("syncId")) return; // Don't load from localStorage if loading from cloud
+      if (urlParams.get("syncId")) return; 
 
       const savedDraft = localStorage.getItem("mibz-cv-draft");
       const savedStyles = localStorage.getItem("mibz-cv-styles");
@@ -133,11 +141,10 @@ export default function CVMakerPage() {
         try {
           const parsed = JSON.parse(savedDraft);
           reset(parsed);
+          setAppMode("workspace"); // Jump directly to workspace if user has a saved draft
         } catch (e) {
           console.error("Error parsing CV draft", e);
         }
-      } else {
-        reset(sampleCVData);
       }
 
       if (savedStyles) {
@@ -150,9 +157,9 @@ export default function CVMakerPage() {
     }
   }, [reset]);
 
-  // Auto-save draft on data changes
+  // Auto-save draft on data changes (Only triggers if workspace is active)
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && appMode === "workspace") {
       setSaveStatus("saving");
       
       // If synced, mark as unsynced since user made changes
@@ -169,7 +176,7 @@ export default function CVMakerPage() {
 
       return () => clearTimeout(delay);
     }
-  }, [watchedValues, styleConfig]);
+  }, [watchedValues, styleConfig, appMode]);
 
   // Cloud Synchronize Handler
   const handleCloudSync = async () => {
@@ -203,23 +210,48 @@ export default function CVMakerPage() {
     }
   };
 
-  // Handle Load Sample Data
-  const handleLoadSample = () => {
-    reset(sampleCVData);
-    setStyleConfig(defaultStyleConfig);
-    // Smooth scroll to builder
+  // Start fresh from scratch
+  const handleCreateFromScratch = () => {
+    reset(emptyCVData);
+    setAppMode("workspace");
     scrollToBuilder();
   };
 
-  // Handle Clear All Fields
+
+
+  // Handle successful file parsing
+  const handleParseComplete = (parsedData: CVData) => {
+    reset(parsedData);
+    setAppMode("workspace");
+    scrollToBuilder();
+  };
+
+  // Reset current changes to blank state or template sample
+  const handleReset = () => {
+    reset(sampleCVData);
+    setShowResetConfirm(false);
+  };
+
+  // Clear fields completely
   const handleClearAll = () => {
     reset(emptyCVData);
+    localStorage.removeItem("mibz-cv-draft");
     setShowClearConfirm(false);
+  };
+
+  // Triggers upload gateway again
+  const handleUploadAnother = () => {
+    reset(emptyCVData);
+    localStorage.removeItem("mibz-cv-draft");
+    setAppMode("upload");
+    setShowUploadAnotherConfirm(false);
   };
 
   // Scroll to Builder Container
   const scrollToBuilder = () => {
-    builderRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => {
+      builderRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   };
 
   // Print CV / PDF Download trigger
@@ -234,11 +266,11 @@ export default function CVMakerPage() {
     const url = URL.createObjectURL(blob);
     const downloadAnchor = document.createElement("a");
     downloadAnchor.href = url;
-    downloadAnchor.download = `resume_${watchedValues.personalInfo.fullName.replace(/\s+/g, "_") || "cv"}.json`;
+    downloadAnchor.download = `${watchedValues.personalInfo.fullName.replace(/\s+/g, "-") || "Untitled"}-ATS-CV.json`;
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     document.body.removeChild(downloadAnchor);
-    URL.revokeObjectURL(url); // release memory
+    URL.revokeObjectURL(url);
   };
 
   // Export standalone styled HTML file using Blob URL storage
@@ -381,7 +413,7 @@ export default function CVMakerPage() {
     const url = URL.createObjectURL(blob);
     const downloadAnchor = document.createElement("a");
     downloadAnchor.href = url;
-    downloadAnchor.download = `resume_${watchedValues.personalInfo.fullName.replace(/\s+/g, "_") || "cv"}.html`;
+    downloadAnchor.download = `${watchedValues.personalInfo.fullName.replace(/\s+/g, "-") || "Untitled"}-ATS-CV.html`;
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     document.body.removeChild(downloadAnchor);
@@ -398,6 +430,7 @@ export default function CVMakerPage() {
       try {
         const parsed = JSON.parse(event.target?.result as string);
         reset(parsed);
+        setAppMode("workspace");
       } catch {
         alert("Failed to parse JSON file. Make sure it is a valid CV backup.");
       }
@@ -408,252 +441,448 @@ export default function CVMakerPage() {
   return (
     <div className="min-h-screen bg-brand-dark flex flex-col justify-between selection:bg-brand-emerald/30 selection:text-brand-emerald text-foreground antialiased relative">
       
+      {/* Dynamic highlighting styles for missing empty inputs */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes highlightPulse {
+          0%, 100% { border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.1); }
+          50% { border-color: rgba(239, 68, 68, 0.85); box-shadow: 0 0 8px 2px rgba(239, 68, 68, 0.15); }
+        }
+        .highlight-missing input:placeholder-shown:not([type="checkbox"]),
+        .highlight-missing textarea:placeholder-shown {
+          animation: highlightPulse 1.5s infinite ease-in-out !important;
+          background-color: rgba(239, 68, 68, 0.03) !important;
+        }
+      `}} />
+
       <Navbar />
 
       {/* Main Container */}
       <main id="main-content" className="flex-grow z-10 pt-24 pb-16">
         
-        {/* HERO SECTION */}
-        <section className="relative px-6 md:px-12 max-w-7xl mx-auto py-12 md:py-20 text-center overflow-hidden">
-          {/* Glowing background shapes */}
+        {/* HERO HEADER */}
+        <section className="relative px-6 md:px-12 max-w-7xl mx-auto py-12 md:py-16 text-center overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-emerald/5 blur-[120px] rounded-full pointer-events-none -z-10 animate-pulse-slow"></div>
-          <div className="absolute top-1/4 left-1/3 w-[300px] h-[300px] bg-brand-blue/5 blur-[90px] rounded-full pointer-events-none -z-10"></div>
           
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="space-y-6 max-w-3xl mx-auto"
+            transition={{ duration: 0.6 }}
+            className="space-y-4 max-w-3xl mx-auto"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-emerald/20 bg-brand-emerald/5 text-brand-emerald text-xs font-semibold tracking-wider uppercase">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-emerald/20 bg-brand-emerald/5 text-brand-emerald text-xs font-semibold uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5 animate-spin-slow" />
               100% Recruiter Safe & Selectable Text
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-extrabold tracking-tight text-white leading-tight">
+            <h1 className="text-4xl md:text-5xl font-heading font-extrabold tracking-tight text-white leading-tight">
               ATS Friendly <span className="bg-gradient-to-r from-brand-emerald to-brand-blue bg-clip-text text-transparent">CV Maker</span>
             </h1>
 
-            <p className="text-base md:text-lg text-brand-gray-400 max-w-2xl mx-auto leading-relaxed">
-              Create a clean, recruiter-ready resume that is easy to read, easy to edit, and built for modern hiring systems. Zero tables, zero columns that break parsers, and zero graphics.
+            <p className="text-sm md:text-base text-brand-gray-400 max-w-2xl mx-auto leading-relaxed">
+              Upload your existing CV, check your ATS score, edit the content directly in the builder, and export a clean recruiter-friendly resume.
             </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-4">
-              <button
-                onClick={scrollToBuilder}
-                className="w-full sm:w-auto h-12 px-8 rounded-full bg-gradient-to-r from-brand-emerald to-brand-blue text-brand-dark font-heading font-bold hover:opacity-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:shadow-[0_0_35px_rgba(16,185,129,0.45)] cursor-pointer group"
-              >
-                <span>Start Building</span>
-                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-              </button>
-
-              <button
-                onClick={handleLoadSample}
-                className="w-full sm:w-auto h-12 px-8 rounded-full border border-brand-gray-800 bg-brand-card hover:bg-brand-gray-900 text-white font-heading font-semibold hover:border-brand-gray-650 transition-all flex items-center justify-center gap-2"
-              >
-                <BookOpen className="w-4 h-4 text-brand-emerald" />
-                <span>Load Sample CV</span>
-              </button>
-            </div>
           </motion.div>
         </section>
 
-        {/* BUILDER WORKSPACE */}
-        <section ref={builderRef} className="px-4 sm:px-6 md:px-12 max-w-7xl mx-auto space-y-6 scroll-mt-24">
-          
-          {/* CONTROL BAR (Top Panel) */}
-          <div className="bg-brand-card/50 border border-brand-gray-800/80 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* 2. CHOICE INITIAL GATEWAY */}
+        <section ref={builderRef} className="px-4 sm:px-6 md:px-12 max-w-7xl mx-auto scroll-mt-24">
+          <AnimatePresence mode="wait">
             
-            {/* Status alerts */}
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <div className="text-left">
-                <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                  CV Builder Workspace
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-emerald animate-ping"></span>
-                </h2>
-                <div className="text-[10px] font-mono text-brand-gray-400 flex items-center gap-2 mt-0.5">
-                  {saveStatus === "saving" && (
-                    <span className="text-brand-blue flex items-center gap-1">
-                      <RefreshCw className="w-3 h-3 animate-spin" /> Saving draft...
-                    </span>
-                  )}
-                  {saveStatus === "saved" && (
-                    <span className="text-brand-emerald flex items-center gap-1">
-                      <Check className="w-3 h-3" /> Draft saved to browser
-                    </span>
-                  )}
-                  {saveStatus === "idle" && (
-                    <span className="text-brand-gray-500">Draft up to date</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Print and Utility Buttons */}
-            <div className="flex flex-wrap items-center justify-end gap-2.5 w-full md:w-auto">
-              {/* Import JSON button wrapper */}
-              <label className="h-10 px-3.5 rounded-lg bg-brand-dark hover:bg-brand-card border border-brand-gray-800 text-brand-gray-300 hover:text-white transition-all text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer focus-within:ring-1 focus-within:ring-brand-emerald select-none">
-                <Undo className="w-4 h-4 text-brand-gray-400 rotate-90" />
-                <span>Import JSON</span>
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleImportJSON}
-                  className="sr-only"
-                />
-              </label>
-
-              <DownloadPDFButton
-                onPrint={handlePrint}
-                onExportJSON={handleExportJSON}
-                onExportHTML={handleExportHTML}
-                onCloudSync={handleCloudSync}
-                dbConfigured={dbConfigured}
-                cloudSyncStatus={cloudSyncStatus}
-              />
-
-              {/* Clear fields triggers */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowClearConfirm(!showClearConfirm)}
-                  className="h-10 px-3 rounded-lg border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-1.5 text-xs font-semibold"
+            {appMode === "initial" && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 py-6"
+              >
+                {/* Upload Existing CV Card */}
+                <div
+                  onClick={() => setAppMode("upload")}
+                  className="bg-brand-card border border-brand-gray-800 hover:border-brand-emerald/30 rounded-2xl p-8 text-center transition-all cursor-pointer group hover:bg-brand-card/80 hover:shadow-[0_0_35px_rgba(16,185,129,0.08)] relative overflow-hidden"
                 >
-                  <Trash2 className="w-4 h-4" />
-                  <span>Clear All</span>
-                </button>
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-brand-emerald/5 blur-[25px] rounded-full pointer-events-none"></div>
+                  <div className="p-4 rounded-xl border border-brand-gray-800 bg-brand-dark mb-5 text-brand-emerald mx-auto w-14 h-14 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                    <UploadCloud className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">Upload Existing CV</h3>
+                  <p className="text-xs text-brand-gray-400 leading-relaxed">
+                    Convert your current resume file (PDF, DOCX, DOC, or TXT) into a cleaner parser-safe structure in seconds.
+                  </p>
+                  <div className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-brand-emerald group-hover:underline">
+                    <span>Convert CV</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </div>
+                </div>
 
-                {/* Clear Confirmation Modal Pop-over */}
-                {showClearConfirm && (
-                  <div className="absolute right-0 bottom-12 md:bottom-auto md:top-12 w-56 bg-brand-dark border border-brand-gray-800 rounded-xl p-3.5 shadow-2xl z-20 space-y-3">
-                    <p className="text-xs font-medium text-brand-gray-300 leading-normal">
-                      Are you sure you want to clear all data? This draft will be deleted.
-                    </p>
-                    <div className="flex gap-2 justify-end">
+                {/* Create From Scratch Card */}
+                <div
+                  onClick={handleCreateFromScratch}
+                  className="bg-brand-card border border-brand-gray-800 hover:border-brand-blue/30 rounded-2xl p-8 text-center transition-all cursor-pointer group hover:bg-brand-card/80 hover:shadow-[0_0_35px_rgba(59,130,246,0.08)] relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-brand-blue/5 blur-[25px] rounded-full pointer-events-none"></div>
+                  <div className="p-4 rounded-xl border border-brand-gray-800 bg-brand-dark mb-5 text-brand-blue mx-auto w-14 h-14 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                    <FileEdit className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">Create from Scratch</h3>
+                  <p className="text-xs text-brand-gray-400 leading-relaxed">
+                    Build a professional CV step-by-step using our interactive checklists. Pre-loads template guides.
+                  </p>
+                  <div className="mt-6 inline-flex items-center gap-1 text-xs font-semibold text-brand-blue group-hover:underline">
+                    <span>Start Building</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* 3. CONVERTER COMPONENT INTERFACE */}
+            {appMode === "upload" && (
+              <CVUploadConverter
+                onParseComplete={handleParseComplete}
+                onCancel={() => setAppMode("initial")}
+              />
+            )}
+
+            {/* 4. WORKSPACE DASHBOARD */}
+            {appMode === "workspace" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
+                className="space-y-6"
+              >
+                
+                {/* TOOLBAR/CONTROL PANEL */}
+                <div className="bg-brand-card/50 border border-brand-gray-800 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                  
+                  {/* Draft autosave and general actions */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto">
+                    <div className="text-left">
+                      <h2 className="text-xs font-bold text-white flex items-center gap-1.5">
+                        CV Builder Workspace
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-emerald animate-pulse"></span>
+                      </h2>
+                      
+                      <div className="text-[10px] font-mono text-brand-gray-400 flex items-center gap-2 mt-0.5">
+                        {saveStatus === "saving" && (
+                          <span className="text-brand-blue flex items-center gap-1">
+                            <RefreshCw className="w-3 h-3 animate-spin" /> Auto-saving...
+                          </span>
+                        )}
+                        {saveStatus === "saved" && (
+                          <span className="text-brand-emerald flex items-center gap-1">
+                            <Check className="w-3 h-3" /> Stored locally
+                          </span>
+                        )}
+                        {saveStatus === "idle" && (
+                          <span className="text-brand-gray-500">Draft saved</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="h-4 w-px bg-brand-gray-800 hidden sm:block"></div>
+
+                    {/* Return upload gateways */}
+                    <div className="relative">
                       <button
                         type="button"
-                        onClick={() => setShowClearConfirm(false)}
-                        className="px-2.5 py-1 rounded bg-brand-card text-[11px] font-semibold text-brand-gray-400 hover:text-white"
+                        onClick={() => setShowUploadAnotherConfirm(!showUploadAnotherConfirm)}
+                        className="px-3 py-1.5 rounded-md border border-brand-gray-800 bg-brand-dark hover:bg-brand-card text-[11px] text-brand-gray-300 hover:text-white transition-colors"
                       >
-                        Cancel
+                        Upload Another CV
                       </button>
-                      <button
-                        type="button"
-                        onClick={handleClearAll}
-                        className="px-2.5 py-1 rounded bg-red-500 text-brand-dark text-[11px] font-bold hover:bg-red-600"
-                      >
-                        Yes, Clear
-                      </button>
+
+                      {showUploadAnotherConfirm && (
+                        <div className="absolute left-0 top-10 w-56 bg-brand-dark border border-brand-gray-800 rounded-xl p-3 shadow-2xl z-20 space-y-3">
+                          <p className="text-[10px] text-brand-gray-300 leading-normal">
+                            Uploading another CV will clear your active workspace data. Are you sure?
+                          </p>
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              type="button"
+                              onClick={() => setShowUploadAnotherConfirm(false)}
+                              className="px-2 py-0.5 rounded bg-brand-card text-[10px] text-brand-gray-400 hover:text-white"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleUploadAnother}
+                              className="px-2 py-0.5 rounded bg-brand-emerald text-brand-dark text-[10px] font-bold"
+                            >
+                              Confirm
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
+
+                  {/* Actions buttons panel */}
+                  <div className="flex flex-wrap items-center justify-end gap-2.5 w-full md:w-auto">
+                    {/* Backup importer */}
+                    <label className="h-10 px-3.5 rounded-lg bg-brand-dark hover:bg-brand-card border border-brand-gray-800 text-brand-gray-300 hover:text-white transition-all text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
+                      <Undo className="w-4 h-4 text-brand-gray-400 rotate-90" />
+                      <span>Import JSON</span>
+                      <input
+                        type="file"
+                        accept=".json"
+                        onChange={handleImportJSON}
+                        className="sr-only"
+                      />
+                    </label>
+
+                    <DownloadPDFButton
+                      onPrint={handlePrint}
+                      onExportJSON={handleExportJSON}
+                      onExportHTML={handleExportHTML}
+                      onCloudSync={handleCloudSync}
+                      dbConfigured={dbConfigured}
+                      cloudSyncStatus={cloudSyncStatus}
+                    />
+
+                    {/* Reset actions */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowResetConfirm(!showResetConfirm)}
+                        className="h-10 px-3.5 rounded-lg border border-brand-gray-800 bg-brand-dark text-brand-gray-400 hover:text-white text-xs font-semibold"
+                        title="Reset to sample templates"
+                      >
+                        Reset Changes
+                      </button>
+                      
+                      {showResetConfirm && (
+                        <div className="absolute right-0 top-12 w-52 bg-brand-dark border border-brand-gray-800 rounded-xl p-3 shadow-2xl z-20 space-y-3">
+                          <p className="text-[10px] text-brand-gray-300 leading-normal">
+                            Reset all details to the sample resume data?
+                          </p>
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              type="button"
+                              onClick={() => setShowResetConfirm(false)}
+                              className="px-2 py-0.5 rounded bg-brand-card text-[10px] text-brand-gray-400"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleReset}
+                              className="px-2 py-0.5 rounded bg-brand-blue text-white text-[10px]"
+                            >
+                              Reset
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Clear completely */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowClearConfirm(!showClearConfirm)}
+                        className="h-10 px-3.5 rounded-lg border border-red-500/10 bg-red-500/5 hover:bg-red-500/15 text-red-400 transition-colors flex items-center justify-center gap-1.5 text-xs font-semibold"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span>Clear All</span>
+                      </button>
+
+                      {showClearConfirm && (
+                        <div className="absolute right-0 top-12 w-52 bg-brand-dark border border-brand-gray-800 rounded-xl p-3 shadow-2xl z-20 space-y-3">
+                          <p className="text-[10px] text-brand-gray-300 leading-normal">
+                            Are you sure you want to clear all CV fields? This draft will be deleted.
+                          </p>
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              type="button"
+                              onClick={() => setShowClearConfirm(false)}
+                              className="px-2 py-0.5 rounded bg-brand-card text-[10px] text-brand-gray-400"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleClearAll}
+                              className="px-2 py-0.5 rounded bg-red-500 text-brand-dark text-[10px] font-bold"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cloud Sync active share banner */}
+                {dbConfigured && syncId && (
+                  <div className="bg-brand-card/45 border border-brand-gray-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                    <div className="space-y-0.5 text-left w-full">
+                      <span className="font-semibold text-white block">
+                        {cloudSyncStatus === "synced" ? "🚀 Cloud Synchronization Active" : "☁️ Real-time Cloud Backups Enabled"}
+                      </span>
+                      <span className="text-brand-gray-400 block leading-normal">
+                        Your CV draft sync token: <code className="text-brand-emerald bg-brand-dark px-1.5 py-0.5 rounded font-mono font-semibold">{syncId}</code>. 
+                        {cloudSyncStatus === "synced" 
+                          ? "Retrieve or edit it on any browser using the sharing link below:" 
+                          : "Save your work to the database to generate a unique sharing link."}
+                      </span>
+                      {cloudSyncStatus === "synced" && (
+                        <span className="text-brand-blue block mt-1 break-all select-all font-mono font-medium underline">
+                          {typeof window !== "undefined" ? `${window.location.origin}/cv-maker?syncId=${syncId}` : ""}
+                        </span>
+                      )}
+                    </div>
+                    {cloudSyncStatus === "synced" && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const shareUrl = `${window.location.origin}/cv-maker?syncId=${syncId}`;
+                          navigator.clipboard.writeText(shareUrl);
+                          alert("Sharing URL copied to clipboard!");
+                        }}
+                        className="w-full sm:w-auto h-8 px-3 rounded bg-brand-emerald text-brand-dark font-heading font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 flex-shrink-0"
+                      >
+                        Copy Link
+                      </button>
+                    )}
+                  </div>
                 )}
-              </div>
-            </div>
-          </div>
 
-          {/* Cloud Sync Retrieval Banner */}
-          {dbConfigured && syncId && (
-            <div className="bg-brand-card/40 border border-brand-gray-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-              <div className="space-y-0.5 text-left w-full">
-                <span className="font-semibold text-white block">
-                  {cloudSyncStatus === "synced" ? "🚀 Cloud Synchronization Active" : "☁️ Real-time Cloud Backups Enabled"}
-                </span>
-                <span className="text-brand-gray-400 block leading-normal">
-                  Your CV draft has a unique sync token: <code className="text-brand-emerald bg-brand-dark px-1.5 py-0.5 rounded font-mono font-semibold">{syncId}</code>. 
-                  {cloudSyncStatus === "synced" 
-                    ? "Retrieve or edit it on any browser using the sharing link below:" 
-                    : "Save your work to the database to generate a unique sharing link."}
-                </span>
-                {cloudSyncStatus === "synced" && (
-                  <span className="text-brand-blue block mt-1 break-all select-all font-mono font-medium underline">
-                    {typeof window !== "undefined" ? `${window.location.origin}/cv-maker?syncId=${syncId}` : ""}
-                  </span>
+                {/* Sync error banner */}
+                {cloudSyncError && (
+                  <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 text-xs text-red-400">
+                    ⚠️ <strong>Database sync failed:</strong> {cloudSyncError}
+                  </div>
                 )}
-              </div>
-              {cloudSyncStatus === "synced" && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const shareUrl = `${window.location.origin}/cv-maker?syncId=${syncId}`;
-                    navigator.clipboard.writeText(shareUrl);
-                    alert("Sharing URL copied to clipboard!");
-                  }}
-                  className="w-full sm:w-auto h-8 px-3 rounded bg-brand-emerald text-brand-dark font-heading font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 flex-shrink-0"
-                >
-                  Copy Link
-                </button>
-              )}
-            </div>
-          )}
 
-          {/* Sync failure warning alert */}
-          {cloudSyncError && (
-            <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 text-xs text-red-400">
-              ⚠️ <strong>Database sync failed:</strong> {cloudSyncError}
-            </div>
-          )}
+                {/* MOBILE VIEW NAVIGATION TABS */}
+                <div className="lg:hidden flex border-b border-brand-gray-800">
+                  <button
+                    onClick={() => setMobileTab("edit")}
+                    className={`flex-1 py-3 text-xs font-bold border-b-2 transition-all ${
+                      mobileTab === "edit" ? "border-brand-emerald text-white bg-brand-card/20" : "border-transparent text-brand-gray-400"
+                    }`}
+                  >
+                    Edit Form
+                  </button>
+                  <button
+                    onClick={() => setMobileTab("preview")}
+                    className={`flex-1 py-3 text-xs font-bold border-b-2 transition-all ${
+                      mobileTab === "preview" ? "border-brand-emerald text-white bg-brand-card/20" : "border-transparent text-brand-gray-400"
+                    }`}
+                  >
+                    Live Preview
+                  </button>
+                  <button
+                    onClick={() => setMobileTab("ats")}
+                    className={`flex-1 py-3 text-xs font-bold border-b-2 transition-all ${
+                      mobileTab === "ats" ? "border-brand-emerald text-white bg-brand-card/20" : "border-transparent text-brand-gray-400"
+                    }`}
+                  >
+                    ATS Score
+                  </button>
+                </div>
 
-          {/* MAIN COLUMN WRAPPER */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
-            {/* LEFT SIDE: BUILDER FORM PANEL */}
-            <div className="lg:col-span-6 space-y-6">
-              
-              {/* Template Style Selectors */}
-              <TemplateSelector config={styleConfig} onChange={setStyleConfig} />
+                {/* WORKSPACE CONTENT GRID */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                  
+                  {/* LEFT / EDIT FORM COLUMN */}
+                  <div className={`lg:col-span-5 space-y-6 ${mobileTab === "edit" ? "block" : "hidden lg:block"}`}>
+                    
+                    {/* Template styles */}
+                    <TemplateSelector config={styleConfig} onChange={setStyleConfig} />
 
-              {/* Form elements wrapped in React Hook Form FormProvider */}
-              <FormProvider {...methods}>
-                <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-                  <CVForm />
-                </form>
-              </FormProvider>
+                    {/* Forms wrapper */}
+                    <FormProvider {...methods}>
+                      <form onSubmit={(e) => e.preventDefault()} className={`space-y-4 ${highlightMissing ? "highlight-missing" : ""}`}>
+                        <CVForm />
+                      </form>
+                    </FormProvider>
+                  </div>
 
-              {/* ATS scoring widget */}
-              <ATSScore data={watchedValues} />
-            </div>
+                  {/* CENTER / PREVIEW COLUMN */}
+                  <div className={`lg:col-span-4 lg:sticky lg:top-24 space-y-4 max-h-[85vh] overflow-y-auto no-scrollbar pr-1 ${mobileTab === "preview" ? "block" : "hidden lg:block"}`}>
+                    <div className="hidden lg:flex items-center justify-between border-b border-brand-gray-800 pb-2">
+                      <span className="text-[10px] font-semibold text-brand-gray-400 tracking-wider uppercase flex items-center gap-1.5">
+                        <Eye className="w-4 h-4 text-brand-emerald" /> Live A4 Preview
+                      </span>
+                      <span className="text-[9px] font-mono text-brand-gray-500">
+                        Standard Letter / A4 Print
+                      </span>
+                    </div>
+                    <CVPreview data={watchedValues} styleConfig={styleConfig} />
+                  </div>
 
-            {/* RIGHT SIDE: LIVE A4 PREVIEW PANEL (Sticky on desktop viewports) */}
-            <div className="hidden lg:block lg:col-span-6 lg:sticky lg:top-24 space-y-4 max-h-[85vh] overflow-y-auto no-scrollbar pr-1">
-              <div className="flex items-center justify-between border-b border-brand-gray-800 pb-2">
-                <span className="text-xs font-semibold text-brand-gray-400 tracking-wider uppercase flex items-center gap-1.5">
-                  <Eye className="w-4 h-4 text-brand-emerald" /> Live A4 Preview
-                </span>
-                <span className="text-[10px] font-mono text-brand-gray-500">
-                  Standard Letter / A4 Print Area
-                </span>
-              </div>
-              <CVPreview data={watchedValues} styleConfig={styleConfig} />
-            </div>
+                  {/* RIGHT / ATS SCORE PANEL */}
+                  <div className={`lg:col-span-3 lg:sticky lg:top-24 ${mobileTab === "ats" ? "block" : "hidden lg:block"}`}>
+                    <ATSScoreChecker 
+                      data={watchedValues}
+                      onHighlightMissingFields={setHighlightMissing}
+                    />
+                  </div>
 
-          </div>
+                </div>
 
+                {/* MOBILE VIEW ACTIONS */}
+                <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-brand-dark/95 border-t border-brand-gray-800 p-4 z-40 flex items-center justify-between gap-3 shadow-[0_-5px_25px_rgba(0,0,0,0.5)]">
+                  <button
+                    onClick={() => {
+                      localStorage.setItem("mibz-cv-draft", JSON.stringify(watchedValues));
+                      alert("Draft saved successfully!");
+                    }}
+                    className="flex-1 h-11 border border-brand-gray-800 bg-brand-card rounded-xl text-xs font-semibold text-white"
+                  >
+                    Save Draft
+                  </button>
+                  <button
+                    onClick={() => setMobileTab("preview")}
+                    className="h-11 px-4 border border-brand-gray-850 bg-brand-dark rounded-xl text-brand-gray-300"
+                    title="Preview Layout"
+                  >
+                    <Eye className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={handlePrint}
+                    className="flex-[2] h-11 bg-gradient-to-r from-brand-emerald to-brand-blue rounded-xl text-xs font-bold text-brand-dark flex items-center justify-center gap-1.5"
+                  >
+                    <FileDown className="w-4.5 h-4.5" />
+                    <span>Download PDF</span>
+                  </button>
+                </div>
+
+              </motion.div>
+            )}
+
+          </AnimatePresence>
         </section>
 
-        {/* BOTTOM CTA: Portfolio developer pitch */}
-        <section className="px-6 md:px-12 max-w-5xl mx-auto pt-24 pb-6 text-center">
-          <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-br from-brand-card/70 via-brand-dark to-brand-card/40 border border-brand-gray-800/80 relative overflow-hidden">
+        {/* BOTTOM DEVELOPER CTA */}
+        <section className="px-6 md:px-12 max-w-5xl mx-auto pt-20 pb-6 text-center">
+          <div className="p-8 md:p-10 rounded-2xl bg-gradient-to-br from-brand-card/70 via-brand-dark to-brand-card/40 border border-brand-gray-800 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-brand-blue/5 blur-[50px] rounded-full pointer-events-none -z-10"></div>
             
-            <div className="max-w-2xl mx-auto space-y-5">
-              <h2 className="text-2xl md:text-3xl font-heading font-bold text-white leading-tight">
-                Want a portfolio website with smart career tools?
+            <div className="max-w-2xl mx-auto space-y-4">
+              <h2 className="text-xl md:text-2xl font-heading font-bold text-white">
+                Looking for automated web solutions?
               </h2>
-              <p className="text-sm md:text-base text-brand-gray-400 leading-relaxed">
-                I build modern, responsive, and conversion-focused web experiences with custom integrations, 3D interactive visuals, and SEO excellence.
+              <p className="text-xs md:text-sm text-brand-gray-400 leading-relaxed">
+                I design premium, conversion-focused websites featuring advanced cloud-linked tools, dynamic search checkers, and search engine optimizations.
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <a
                   href="/#contact"
-                  className="px-6 py-2.5 rounded-full bg-gradient-to-r from-brand-emerald to-brand-blue text-brand-dark font-heading font-semibold text-sm hover:opacity-90 transition-opacity flex items-center gap-1"
+                  className="px-5 py-2.5 rounded-full bg-gradient-to-r from-brand-emerald to-brand-blue text-brand-dark font-heading font-semibold text-xs transition-opacity hover:opacity-90 flex items-center gap-1"
                 >
                   Contact Me
                 </a>
                 <a
                   href="/portfolio"
-                  className="px-6 py-2.5 rounded-full border border-brand-gray-800 bg-brand-dark hover:bg-brand-card text-brand-gray-300 hover:text-white transition-colors text-sm font-semibold"
+                  className="px-5 py-2.5 rounded-full border border-brand-gray-800 bg-brand-dark hover:bg-brand-card text-brand-gray-300 hover:text-white transition-colors text-xs font-semibold"
                 >
-                  View My Work
+                  View Portfolios
                 </a>
               </div>
             </div>
@@ -661,61 +890,6 @@ export default function CVMakerPage() {
         </section>
 
       </main>
-
-      {/* MOBILE STICKY TOGGLE BUTTON */}
-      <div className="lg:hidden fixed bottom-6 right-6 z-40">
-        <button
-          onClick={() => setMobilePreviewOpen(!mobilePreviewOpen)}
-          className="p-4 rounded-full bg-gradient-to-r from-brand-emerald to-brand-blue text-brand-dark shadow-[0_4px_20px_rgba(16,185,129,0.4)] flex items-center justify-center transition-all hover:scale-105 active:scale-95"
-          aria-label={mobilePreviewOpen ? "Close Live Preview" : "Show Live Preview"}
-        >
-          {mobilePreviewOpen ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-        </button>
-      </div>
-
-      {/* MOBILE FULL-SCREEN PREVIEW OVERLAY */}
-      <AnimatePresence>
-        {mobilePreviewOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: "100%" }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="lg:hidden fixed inset-0 z-50 bg-brand-dark/95 backdrop-blur-md pt-20 pb-6 px-4 flex flex-col justify-between overflow-y-auto"
-          >
-            <div className="flex items-center justify-between border-b border-brand-gray-800 pb-3 mb-4">
-              <span className="text-sm font-bold text-white flex items-center gap-1.5">
-                <Eye className="w-4 h-4 text-brand-emerald" /> Mobile CV Preview
-              </span>
-              <button
-                onClick={() => setMobilePreviewOpen(false)}
-                className="px-3 py-1.5 rounded-md bg-brand-card hover:bg-brand-gray-800 border border-brand-gray-800 text-brand-gray-400 hover:text-white text-xs font-semibold"
-              >
-                Close Preview
-              </button>
-            </div>
-            
-            <div className="flex-grow flex items-center justify-center p-1 overflow-x-auto">
-              <div className="w-full max-w-[500px]">
-                <CVPreview data={watchedValues} styleConfig={styleConfig} />
-              </div>
-            </div>
-            
-            <div className="pt-4 flex gap-2">
-              <button
-                onClick={() => {
-                  setMobilePreviewOpen(false);
-                  handlePrint();
-                }}
-                className="flex-grow h-11 rounded-lg bg-gradient-to-r from-brand-emerald to-brand-blue text-brand-dark font-heading font-bold text-sm flex items-center justify-center gap-1.5"
-              >
-                <Download className="w-4 h-4" />
-                <span>Save PDF</span>
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <Footer />
 

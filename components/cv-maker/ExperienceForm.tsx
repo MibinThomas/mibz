@@ -159,9 +159,28 @@ export default function ExperienceForm() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-brand-gray-300 mb-1.5">
-                    Roles, Achievements & Responsibilities *
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="block text-xs font-semibold text-brand-gray-300">
+                      Roles, Achievements & Responsibilities *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const text = watch(`experience.${index}.description`) || "";
+                        const lines = text.split("\n").map(l => {
+                          const trimmed = l.trim();
+                          if (!trimmed) return "";
+                          if (/^[•\-\*▪\+]/.test(trimmed)) return trimmed;
+                          return `- ${trimmed}`;
+                        }).filter(Boolean).join("\n");
+                        setValue(`experience.${index}.description`, lines);
+                      }}
+                      className="text-[10px] font-semibold text-brand-blue hover:text-brand-emerald hover:underline cursor-pointer transition-colors"
+                      title="Add bullet points format automatically"
+                    >
+                      ✨ Convert to bullets
+                    </button>
+                  </div>
                   <textarea
                     rows={4}
                     placeholder="- Spearheaded design and integration of backend modules, boosting load times by 20%&#10;- Managed high-traffic APIs serving 150k+ daily users"

@@ -4,7 +4,7 @@ import { Plus, Trash2, Link, Code, FolderGit } from "lucide-react";
 import { CVFormValues } from "../../lib/cvSchema";
 
 export default function ProjectsForm() {
-  const { register, control, formState: { errors } } = useFormContext<CVFormValues>();
+  const { register, control, watch, setValue, formState: { errors } } = useFormContext<CVFormValues>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "projects",
@@ -115,9 +115,28 @@ export default function ProjectsForm() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-brand-gray-300 mb-1.5">
-                    Key Features, Achievements or Metrics (Optional)
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="block text-xs font-semibold text-brand-gray-300">
+                      Key Features, Achievements or Metrics (Optional)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const text = watch(`projects.${index}.features`) || "";
+                        const lines = text.split("\n").map(l => {
+                          const trimmed = l.trim();
+                          if (!trimmed) return "";
+                          if (/^[•\-\*▪\+]/.test(trimmed)) return trimmed;
+                          return `- ${trimmed}`;
+                        }).filter(Boolean).join("\n");
+                        setValue(`projects.${index}.features`, lines);
+                      }}
+                      className="text-[10px] font-semibold text-brand-blue hover:text-brand-emerald hover:underline cursor-pointer transition-colors"
+                      title="Add bullet points format automatically"
+                    >
+                      ✨ Convert to bullets
+                    </button>
+                  </div>
                   <textarea
                     rows={3}
                     placeholder="- Reduced server latency by 40% through Redis caching&#10;- Integrated server-side conversions API to capture user sessions"

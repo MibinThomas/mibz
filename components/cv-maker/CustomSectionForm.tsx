@@ -4,7 +4,7 @@ import { Plus, Trash2, FileText } from "lucide-react";
 import { CVFormValues } from "../../lib/cvSchema";
 
 export default function CustomSectionForm() {
-  const { register, control, formState: { errors } } = useFormContext<CVFormValues>();
+  const { register, control, watch, setValue, formState: { errors } } = useFormContext<CVFormValues>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "customSections",
@@ -71,9 +71,28 @@ export default function CustomSectionForm() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-brand-gray-300 mb-1.5">
-                  Section Content / Achievements *
-                </label>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-xs font-semibold text-brand-gray-300">
+                    Section Content / Achievements *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const text = watch(`customSections.${index}.content`) || "";
+                      const lines = text.split("\n").map(l => {
+                        const trimmed = l.trim();
+                        if (!trimmed) return "";
+                        if (/^[•\-\*▪\+]/.test(trimmed)) return trimmed;
+                        return `- ${trimmed}`;
+                      }).filter(Boolean).join("\n");
+                      setValue(`customSections.${index}.content`, lines);
+                    }}
+                    className="text-[10px] font-semibold text-brand-blue hover:text-brand-emerald hover:underline cursor-pointer transition-colors"
+                    title="Add bullet points format automatically"
+                  >
+                    ✨ Convert to bullets
+                  </button>
+                </div>
                 <textarea
                   rows={4}
                   placeholder="- Spearheaded organic community cleanups with 200+ volunteers&#10;- Published article on Next.js hydration optimization in WebDev Weekly"
