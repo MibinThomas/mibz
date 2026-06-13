@@ -26,40 +26,45 @@ export default function FloatingContactDial() {
   const socialOptions = [
     {
       name: "Instagram",
-      icon: <Instagram className="w-5 h-5 text-[#E1306C]" />,
-      href: "https://instagram.com/", // Replace with custom profile URL later
+      icon: <Instagram className="w-5 h-5 text-white transition-transform duration-500 group-hover:rotate-[360deg]" />,
+      href: "https://www.instagram.com/", // Replace with custom profile URL later
+      bgClass: "bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]",
       x: -120,
       y: 0,
       delay: 0.05,
     },
     {
       name: "Behance",
-      icon: <BehanceIcon className="w-5 h-5 text-[#0057ff]" />,
+      icon: <BehanceIcon className="w-5 h-5 text-white transition-transform duration-500 group-hover:rotate-[360deg]" />,
       href: "https://www.behance.net/", // Replace with custom profile URL later
+      bgClass: "bg-[#0057ff]",
       x: -104,
       y: -60,
       delay: 0.1,
     },
     {
       name: "WhatsApp",
-      icon: <MessageCircle className="w-5 h-5 text-[#25D366]" />,
+      icon: <MessageCircle className="w-5 h-5 text-white transition-transform duration-500 group-hover:rotate-[360deg]" />,
       href: "https://wa.me/971566556278",
+      bgClass: "bg-[#25D366]",
       x: -60,
       y: -104,
       delay: 0.15,
     },
     {
       name: "Gmail",
-      icon: <Mail className="w-5 h-5 text-[#EA4335]" />,
+      icon: <Mail className="w-5 h-5 text-white transition-transform duration-500 group-hover:rotate-[360deg]" />,
       href: "mailto:mibin@webeyecraft.com",
+      bgClass: "bg-[#EA4335]",
       x: 0,
       y: -120,
       delay: 0.2,
     },
     {
       name: "GitHub",
-      icon: <Github className="w-5 h-5 text-[#181717]" />,
+      icon: <Github className="w-5 h-5 text-white transition-transform duration-500 group-hover:rotate-[360deg]" />,
       href: "https://github.com/MibinThomas",
+      bgClass: "bg-[#181717] border border-brand-gray-800",
       x: 60,
       y: -104,
       delay: 0.25,
@@ -105,7 +110,7 @@ export default function FloatingContactDial() {
                     damping: 20,
                     delay: isOpen ? opt.delay : 0,
                   }}
-                  className="absolute bottom-1 right-1 w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.3)] pointer-events-auto hover:scale-110 active:scale-95 transition-transform duration-200"
+                  className={`absolute bottom-1 right-1 w-12 h-12 rounded-full ${opt.bgClass} flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.35)] pointer-events-auto hover:scale-110 active:scale-95 transition-all duration-200 group`}
                   aria-label={opt.name}
                 >
                   {opt.icon}
