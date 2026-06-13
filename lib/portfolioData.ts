@@ -268,5 +268,24 @@ export const projects: Project[] = [
     tech: ["Next.js 14", "Tailwind CSS", "Framer Motion", "React PDF Engine", "Sanity Studio"],
     themeColor: "#4f46e5", // Indigo
     mockupType: "furniture"
+  },
+  {
+    slug: "webeyecraft",
+    title: "Webeyecraft",
+    category: "Marketing",
+    url: "https://webeyecraft.com/",
+    description: "A premium IT solutions and digital agency website focusing on bespoke web development, branding, and cloud transformation.",
+    overview: "Webeyecraft Technologies is a full-service digital agency delivering high-performance mobile and web solutions, custom enterprise applications, and cloud migration services. The platform serves as a modern portfolio showcasing agency capabilities, product case studies, and cloud consultancy services.",
+    industry: "IT Services & Digital Solutions",
+    role: "Full-Stack Developer & Technical Lead",
+    features: [
+      "Interactive agency service discovery panels highlighting custom web/app development and digital marketing.",
+      "Dynamic project portfolio showcase featuring client digital transformations.",
+      "Optimized, secure enterprise client inquiry form with automated routing.",
+      "Performance-focused static pages achieving sub-second load times and zero layout shifts."
+    ],
+    tech: ["Next.js 14", "Tailwind CSS", "Framer Motion", "TypeScript", "Node.js", "Resend API"],
+    themeColor: "#6366f1", // Indigo
+    mockupType: "marketing"
   }
 ];
