@@ -87,6 +87,7 @@ export default function ProjectDetailsPage({ params }: PageProps) {
               />
               <div className="relative">
                 <AnimatedBrowserMockup
+                  slug={project.slug}
                   url={project.url}
                   themeColor={project.themeColor}
                   type={project.mockupType}

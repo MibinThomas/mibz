@@ -52,6 +52,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       {/* 3D Glassmorphic Browser Mockup */}
       <div style={{ transform: "translateZ(30px)" }} className="relative z-10">
         <AnimatedBrowserMockup
+          slug={project.slug}
           url={project.url}
           themeColor={project.themeColor}
           type={project.mockupType}
