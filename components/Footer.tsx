@@ -46,14 +46,20 @@ export default function Footer() {
             Connect
           </h3>
           <div className="flex flex-col gap-2">
-            <span className="text-brand-gray-300 text-sm flex items-center gap-2">
+            <a
+              href="mailto:mibin@webeyecraft.com"
+              className="text-brand-gray-300 hover:text-brand-emerald transition-colors text-sm flex items-center gap-2"
+            >
               <Mail className="w-4 h-4 text-brand-emerald" />
-              <span>mibin.growth@gmail.com</span>
-            </span>
-            <span className="text-brand-gray-300 text-sm flex items-center gap-2">
+              <span>mibin@webeyecraft.com</span>
+            </a>
+            <a
+              href="tel:+971566556278"
+              className="text-brand-gray-300 hover:text-brand-emerald transition-colors text-sm flex items-center gap-2"
+            >
               <Phone className="w-4 h-4 text-brand-emerald" />
-              <span>+971 50 123 4567</span>
-            </span>
+              <span>+971 56 655 6278</span>
+            </a>
           </div>
 
           <div className="flex items-center gap-4 pt-2">
@@ -67,7 +73,7 @@ export default function Footer() {
               <Linkedin className="w-5 h-5" />
             </a>
             <a
-              href="mailto:mibin.growth@gmail.com"
+              href="mailto:mibin@webeyecraft.com"
               className="p-2.5 rounded-full bg-brand-gray-800 hover:bg-brand-emerald hover:text-brand-dark transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brand-emerald"
               aria-label="Email Mibin Thomas"
             >

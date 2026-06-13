@@ -27,10 +27,10 @@ export default function Contact() {
 
   useEffect(() => {
     // Deliberate construction to prevent static scraper harvesting
-    const user = "mibin.growth";
-    const domain = "gmail.com";
+    const user = "mibin";
+    const domain = "webeyecraft.com";
     setObfuscatedEmail(`${user}@${domain}`);
-    setObfuscatedPhone("+971 50 123 4567");
+    setObfuscatedPhone("+971 56 655 6278");
   }, []);
 
   const validate = (): boolean => {
@@ -114,9 +114,12 @@ export default function Contact() {
               </div>
               <div>
                 <span className="block text-xs text-brand-gray-500 font-bold uppercase tracking-wider">Call Coordinates</span>
-                <span className="text-sm font-semibold text-white">
+                <a
+                  href={`tel:${obfuscatedPhone.replace(/\s+/g, "")}`}
+                  className="text-sm font-semibold text-white hover:text-brand-blue hover:underline transition-colors"
+                >
                   {obfuscatedPhone || "loading..."}
-                </span>
+                </a>
               </div>
             </div>
 
