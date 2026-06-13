@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
+import FloatingContactDial from "@/components/FloatingContactDial";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -78,6 +79,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         {children}
+        <FloatingContactDial />
       </body>
     </html>
   );

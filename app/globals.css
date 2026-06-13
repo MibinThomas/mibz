@@ -98,3 +98,12 @@ body {
   text-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
 }
 
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
