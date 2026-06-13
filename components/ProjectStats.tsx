@@ -7,7 +7,7 @@ export default function ProjectStats() {
   const stats = [
     {
       label: "Websites Delivered",
-      value: "13+",
+      value: "14+",
       icon: <CheckCircle2 className="w-5 h-5 text-brand-emerald" />,
       desc: "Custom high-speed solutions",
     },
