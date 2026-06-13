@@ -9,16 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
+    "@neondatabase/serverless": "^1.1.0",
+    "@react-three/drei": "^9.102.0",
+    "@react-three/fiber": "^8.15.19",
+    "@supabase/supabase-js": "^2.108.1",
+    "framer-motion": "^11.11.0",
+    "gray-matter": "^4.0.3",
+    "lucide-react": "^0.446.0",
     "next": "14.2.35",
     "react": "^18",
     "react-dom": "^18",
-    "three": "^0.159.0",
-    "@react-three/fiber": "^8.15.19",
-    "@react-three/drei": "^9.102.0",
-    "framer-motion": "^11.11.0",
-    "lucide-react": "^0.446.0",
+    "react-hook-form": "^7.79.0",
     "react-markdown": "^9.0.1",
-    "gray-matter": "^4.0.3"
+    "three": "^0.159.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20",
