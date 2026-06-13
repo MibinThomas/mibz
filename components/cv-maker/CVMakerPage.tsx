@@ -28,7 +28,7 @@ const defaultStyleConfig: CVStyleConfig = {
   fontSize: "md",
   spacing: "normal",
   accentColor: "emerald",
-  fontFamily: "Calibri",
+  fontFamily: "Inter",
 };
 
 const emptyCVData: CVData = {
@@ -283,7 +283,11 @@ export default function CVMakerPage() {
       Calibri: "Calibri, Candara, Segoe, sans-serif",
       Helvetica: "'Helvetica Neue', Helvetica, Arial, sans-serif",
       TimesNewRoman: "'Times New Roman', Times, Baskerville, serif",
-      Georgia: "Georgia, Cambria, 'Times New Roman', Times, serif"
+      Georgia: "Georgia, Cambria, 'Times New Roman', Times, serif",
+      Inter: "Inter, sans-serif",
+      Outfit: "Outfit, sans-serif",
+      Poppins: "Poppins, sans-serif",
+      Lora: "Lora, serif"
     };
 
     const paddingStyles = {
@@ -302,6 +306,9 @@ export default function CVMakerPage() {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${watchedValues.personalInfo.fullName || "Resume"} - CV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body {
       background: #ffffff;

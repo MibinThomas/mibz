@@ -138,18 +138,18 @@ export default function CVForm() {
               <label className="block text-[11px] font-bold text-brand-gray-300">
                 Profile Photo
               </label>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                accept="image/*" 
+                onChange={handleImageChange} 
+                className="hidden" 
+              />
               <div 
                 onClick={() => fileInputRef.current?.click()}
                 className="relative group w-20 h-20 rounded-full border-2 border-dashed border-brand-gray-800 hover:border-brand-emerald bg-brand-dark/50 flex flex-col items-center justify-center overflow-hidden cursor-pointer transition-all"
                 title="Upload profile image"
               >
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  accept="image/*" 
-                  onChange={handleImageChange} 
-                  className="hidden" 
-                />
                 {profileImage ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}

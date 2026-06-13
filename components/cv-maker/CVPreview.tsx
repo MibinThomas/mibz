@@ -11,7 +11,11 @@ const fontFamilies: Record<CVStyleConfig["fontFamily"], string> = {
   Calibri: "Calibri, Candara, Segoe, sans-serif",
   Helvetica: "'Helvetica Neue', Helvetica, Arial, sans-serif",
   TimesNewRoman: "'Times New Roman', Times, Baskerville, serif",
-  Georgia: "Georgia, Cambria, 'Times New Roman', Times, serif"
+  Georgia: "Georgia, Cambria, 'Times New Roman', Times, serif",
+  Inter: "Inter, sans-serif",
+  Outfit: "Outfit, sans-serif",
+  Poppins: "Poppins, sans-serif",
+  Lora: "Lora, serif"
 };
 
 const fontSizes: Record<CVStyleConfig["fontSize"], { text: string; h1: string; h2: string; h3: string }> = {
@@ -88,6 +92,8 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
         with pure black text on white background and high contrast layouts.
       */}
       <style dangerouslySetInnerHTML={{ __html: `
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
+
         @media print {
           /* Hide everything except the CV Preview paper sheet */
           body, html {

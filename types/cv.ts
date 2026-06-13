@@ -82,5 +82,5 @@ export interface CVStyleConfig {
   fontSize: "sm" | "md" | "lg";
   spacing: "compact" | "normal" | "spacious";
   accentColor: "emerald" | "blue" | "purple" | "gray" | "red";
-  fontFamily: "Arial" | "Calibri" | "Helvetica" | "TimesNewRoman" | "Georgia";
+  fontFamily: "Arial" | "Calibri" | "Helvetica" | "TimesNewRoman" | "Georgia" | "Inter" | "Outfit" | "Poppins" | "Lora";
 }

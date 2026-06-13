@@ -20,7 +20,11 @@ const fonts = [
   { id: "Calibri", name: "Calibri (Clean)" },
   { id: "Helvetica", name: "Helvetica (Modern)" },
   { id: "TimesNewRoman", name: "Times New Roman (Serif)" },
-  { id: "Georgia", name: "Georgia (Elegant)" }
+  { id: "Georgia", name: "Georgia (Elegant)" },
+  { id: "Inter", name: "Inter (Modern Sans)" },
+  { id: "Outfit", name: "Outfit (Geometric)" },
+  { id: "Poppins", name: "Poppins (Contemporary)" },
+  { id: "Lora", name: "Lora (Modern Serif)" }
 ] as const;
 
 const fontSizes = [
@@ -85,7 +89,7 @@ export default function TemplateSelector({ config, onChange }: TemplateSelectorP
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2 relative z-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4.5 gap-y-4 pt-2 relative z-10">
         {/* Font Family Selector */}
         <div className="space-y-2">
           <label className="block text-[10px] font-bold text-brand-gray-400 uppercase tracking-widest flex items-center gap-1">
