@@ -12,7 +12,9 @@ const templates = [
   { id: "minimal", name: "Modern Minimal" },
   { id: "executive", name: "Executive Clean" },
   { id: "developer", name: "Developer Focused" },
-  { id: "marketing", name: "Marketing Specialist" }
+  { id: "marketing", name: "Marketing Specialist" },
+  { id: "modern_ats", name: "Modern ATS (Single Column)" },
+  { id: "ats_sidebar", name: "ATS Clean (Two-Column)" }
 ] as const;
 
 const fonts = [
@@ -68,7 +70,7 @@ export default function TemplateSelector({ config, onChange }: TemplateSelectorP
         <label className="block text-[10px] font-bold text-brand-gray-400 uppercase tracking-widest">
           CV Template
         </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
           {templates.map((tpl) => {
             const isSelected = config.templateId === tpl.id;
             return (

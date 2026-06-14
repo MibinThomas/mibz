@@ -107,3 +107,70 @@ body {
   scrollbar-width: none; /* Firefox */
 }
 
+/* Print Media Styles */
+@media print {
+  body, html {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  /* Hide all unwanted sections completely on print */
+  header, footer, nav, button, .no-print, .contact-dial, .floating-dial {
+    display: none !important;
+  }
+
+  /* Force display of preview column parent structures */
+  main, #main-content, .workspace-grid, .preview-column, .cv-preview-wrapper, .print-container {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    transform: none !important;
+    position: static !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .print-paper-wrapper {
+    transform: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-shadow: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #cv-preview-sheet {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0.5in !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    position: static !important;
+  }
+
+  /* Hide any other pages or content under main-content */
+  #main-content > section:not(.workspace-section) {
+    display: none !important;
+  }
+}
+

@@ -78,7 +78,7 @@ export interface CVData {
 }
 
 export interface CVStyleConfig {
-  templateId: "classic" | "minimal" | "executive" | "developer" | "marketing";
+  templateId: "classic" | "minimal" | "executive" | "developer" | "marketing" | "modern_ats" | "ats_sidebar";
   fontSize: "sm" | "md" | "lg";
   spacing: "compact" | "normal" | "spacious";
   accentColor: "emerald" | "blue" | "purple" | "gray" | "red";

@@ -48,8 +48,8 @@ const careerMilestones = [
 
 const languages = [
   { name: "English", level: "Professional" },
-  { name: "Tamil", level: "Native" },
-  { name: "Malayalam", level: "Fluent" },
+  { name: "Malayalam", level: "Native" },
+  { name: "Tamil", level: "Fluent" },
   { name: "Hindi", level: "Conversational" },
   { name: "Kannada", level: "Conversational" }
 ];

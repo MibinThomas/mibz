@@ -116,9 +116,9 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
   };
 
   return (
-    <div ref={containerRef} className="w-full overflow-hidden flex justify-center items-start transition-all duration-300" style={{ height: scale < 1 ? `${1050 * scale + 10}px` : "auto" }}>
+    <div ref={containerRef} className="w-full overflow-hidden flex justify-center items-start transition-all duration-300 print-container" style={{ height: scale < 1 ? `${1050 * scale + 10}px` : "auto" }}>
       <div 
-        className="relative shadow-2xl transition-all duration-300" 
+        className="relative shadow-2xl transition-all duration-300 print-paper-wrapper" 
         style={{ 
           transform: scale < 1 ? `scale(${scale})` : "none",
           transformOrigin: "top center",
@@ -181,6 +181,28 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
           /* Enforce proper page breaks inside categories */
           .cv-section {
             page-break-inside: avoid !important;
+          }
+
+          /* Reset print wrapper constraints */
+          .print-container {
+            display: block !important;
+            height: auto !important;
+            overflow: visible !important;
+            width: 100% !important;
+            min-width: 0 !important;
+          }
+          
+          .print-paper-wrapper {
+            transform: none !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            box-shadow: none !important;
+            height: auto !important;
+            overflow: visible !important;
+            display: block !important;
+            position: static !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
         }
       `}} />
@@ -392,11 +414,70 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
             </div>
           )}
 
+          {/* 6. Modern ATS: Clean Single Column */}
+          {templateId === "modern_ats" && (
+            <div className="pb-4 border-b-2 space-y-2 text-center" style={{ borderColor: accentColorHex }}>
+              <h1 className={`${sizeClasses.h1} font-extrabold tracking-wide uppercase text-black`}>
+                {data.personalInfo?.fullName || "Your Full Name"}
+              </h1>
+              <div className="text-xs uppercase tracking-widest font-bold text-brand-gray-650">
+                {data.personalInfo?.jobTitle || "Job Title / Profession"}
+              </div>
+              <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-1 text-xs text-brand-gray-700 font-medium">
+                {data.personalInfo?.email && <span>{data.personalInfo.email}</span>}
+                {data.personalInfo?.phone && <span>| {data.personalInfo.phone}</span>}
+                {data.personalInfo?.location && <span>| {data.personalInfo.location}</span>}
+              </div>
+              <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-1 text-xs text-brand-gray-650 font-semibold font-mono">
+                {data.personalInfo?.linkedinUrl && (
+                  <span className="underline">{data.personalInfo.linkedinUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>
+                )}
+                {data.personalInfo?.portfolioUrl && (
+                  <span className="underline">{data.personalInfo.portfolioUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>
+                )}
+                {data.personalInfo?.githubUrl && (
+                  <span className="underline">{data.personalInfo.githubUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 7. ATS Clean: Two-Column Header */}
+          {templateId === "ats_sidebar" && (
+            <div className="pb-4 border-b border-brand-gray-300 space-y-2">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                  <h1 className={`${sizeClasses.h1} font-bold tracking-tight text-black`}>
+                    {data.personalInfo?.fullName || "Your Full Name"}
+                  </h1>
+                  <div className="text-xs sm:text-sm font-semibold tracking-wide uppercase" style={{ color: accentColorHex }}>
+                    {data.personalInfo?.jobTitle || "Job Title / Profession"}
+                  </div>
+                </div>
+                <div className="text-xs text-brand-gray-650 text-left sm:text-right space-y-0.5">
+                  {data.personalInfo?.email && <div>{data.personalInfo.email}</div>}
+                  {data.personalInfo?.phone && <div>{data.personalInfo.phone}</div>}
+                  {data.personalInfo?.location && <div>{data.personalInfo.location}</div>}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-brand-gray-650 font-medium">
+                {data.personalInfo?.linkedinUrl && (
+                  <span className="underline">{data.personalInfo.linkedinUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>
+                )}
+                {data.personalInfo?.portfolioUrl && (
+                  <span className="underline">{data.personalInfo.portfolioUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>
+                )}
+                {data.personalInfo?.githubUrl && (
+                  <span className="underline">{data.personalInfo.githubUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>
+                )}
+              </div>
+            </div>
+          )}
+
 
           {/* ==========================================
               SECTIONS RENDER (VERTICAL FLOW ONLY)
               ========================================== */}
-
           <div className={secGapClass}>
             
             {/* Section Helper Function */}
@@ -423,6 +504,26 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
                     </div>
                   );
                 }
+                if (templateId === "modern_ats") {
+                  return (
+                    <div className="mt-4 mb-2">
+                      <h2 className={`${sizeClasses.h2} font-extrabold tracking-wider text-black uppercase cv-section-header`}>
+                        {title}
+                      </h2>
+                      <hr style={{ borderColor: accentColorHex }} className="border-t-2 mt-1" />
+                    </div>
+                  );
+                }
+                if (templateId === "ats_sidebar") {
+                  return (
+                    <div className="mt-3 mb-1.5">
+                      <h2 className={`${sizeClasses.h2} font-bold tracking-wide uppercase cv-section-header`} style={{ color: accentColorHex }}>
+                        {title}
+                      </h2>
+                      <hr className="border-t border-brand-gray-200 mt-0.5" />
+                    </div>
+                  );
+                }
                 return (
                   <div className="mt-4 mb-2">
                     <h2 className={`${sizeClasses.h2} font-bold tracking-wide text-black uppercase cv-section-header`}>
@@ -432,6 +533,151 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
                   </div>
                 );
               };
+
+              if (templateId === "ats_sidebar") {
+                return (
+                  <div className="grid grid-cols-12 gap-6 items-start">
+                    {/* Left Column (4/12 width) - contact, skills, education, languages, certifications */}
+                    <div className="col-span-4 space-y-4 pr-4 border-r border-brand-gray-300 min-h-[700px] print-sidebar">
+                      {/* Skills */}
+                      {data.skills.length > 0 && (
+                        <div className="space-y-1">
+                          {renderSectionHeading("Skills")}
+                          <div className="space-y-1 text-xs">
+                            {data.skills.map((s) => (
+                              <div key={s.id} className="text-brand-gray-800 font-medium">
+                                • {s.name}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Education */}
+                      {data.education.length > 0 && (
+                        <div className="space-y-3">
+                          {renderSectionHeading("Education")}
+                          {data.education.map((edu) => (
+                            <div key={edu.id} className="space-y-0.5 text-xs">
+                              <div className="font-bold text-black">{edu.degree}</div>
+                              <div className="text-brand-gray-850 font-semibold">{edu.institution}</div>
+                              <div className="text-[10px] text-brand-gray-600 font-medium">
+                                {edu.startDate} – {edu.endDate}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Languages */}
+                      {data.languages.length > 0 && (
+                        <div className="space-y-1.5">
+                          {renderSectionHeading("Languages")}
+                          <div className="text-xs text-brand-gray-850 space-y-0.5">
+                            {data.languages.map((lang) => (
+                              <div key={lang.id}>
+                                <span className="font-semibold">{lang.name}</span>: <span className="text-brand-gray-650">{lang.proficiency}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Certifications */}
+                      {data.certifications.length > 0 && (
+                        <div className="space-y-2">
+                          {renderSectionHeading("Certifications")}
+                          {data.certifications.map((cert) => (
+                            <div key={cert.id} className="text-xs space-y-0.5">
+                              <div className="font-semibold text-black">{cert.name}</div>
+                              <div className="text-[11px] text-brand-gray-750">{cert.issuer} ({cert.year})</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Column (8/12 width) - Summary, Experience, Projects, Custom Sections */}
+                    <div className="col-span-8 space-y-4 print-main">
+                      {/* Summary */}
+                      {data.summary && (
+                        <div className="space-y-1">
+                          {renderSectionHeading("Summary")}
+                          <p className="text-justify leading-relaxed whitespace-pre-line text-xs">
+                            {data.summary}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Experience */}
+                      {data.experience.length > 0 && (
+                        <div className="space-y-3">
+                          {renderSectionHeading("Experience")}
+                          <div className={itemGapClass}>
+                            {data.experience.map((exp) => (
+                              <div key={exp.id} className="space-y-1 page-break-avoid">
+                                <div className="flex justify-between items-start gap-1">
+                                  <div>
+                                    <div className="font-bold text-black text-xs">{exp.position}</div>
+                                    <div className="font-semibold text-brand-gray-800 text-xs">{exp.company}</div>
+                                  </div>
+                                  <div className="text-[10px] text-brand-gray-605 text-right font-medium">
+                                    <div>{exp.startDate} – {exp.current ? "Present" : exp.endDate}</div>
+                                    {exp.location && <div className="italic">{exp.location}</div>}
+                                  </div>
+                                </div>
+                                <div className="text-brand-gray-850 leading-relaxed text-xs">
+                                  {renderBullets(exp.description)}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Projects */}
+                      {data.projects.length > 0 && (
+                        <div className="space-y-3">
+                          {renderSectionHeading("Projects")}
+                          <div className={itemGapClass}>
+                            {data.projects.map((proj) => (
+                              <div key={proj.id} className="space-y-1 page-break-avoid">
+                                <div className="flex justify-between items-start gap-1">
+                                  <div>
+                                    <span className="font-bold text-black text-xs">{proj.name}</span>
+                                    {proj.url && (
+                                      <span className="text-[10px] text-brand-gray-650 underline ml-2">({proj.url})</span>
+                                    )}
+                                  </div>
+                                  <div className="text-[10px] font-semibold text-brand-gray-650 font-mono">
+                                    {proj.techStack}
+                                  </div>
+                                </div>
+                                <p className="text-brand-gray-800 leading-normal text-xs">{proj.description}</p>
+                                {proj.features && (
+                                  <div className="text-brand-gray-850 leading-relaxed text-xs">
+                                    {renderBullets(proj.features)}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Custom Sections */}
+                      {data.customSections.map((sect) => (
+                        <div key={sect.id} className="space-y-1 page-break-avoid">
+                          {renderSectionHeading(sect.title)}
+                          <div className="text-brand-gray-850 leading-relaxed text-xs">
+                            {sect.content.includes("\n") ? renderBullets(sect.content) : <p className="text-justify">{sect.content}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
 
               return (
                 <div className={secGapClass}>
@@ -459,7 +705,7 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
                                 <span className="text-brand-gray-650"> | </span>
                                 <span className="font-semibold text-brand-gray-800">{exp.company}</span>
                               </div>
-                              <div className="text-xs text-brand-gray-600 sm:text-right font-medium">
+                              <div className="text-xs text-brand-gray-650 sm:text-right font-medium">
                                 <span>{exp.startDate} – {exp.current ? "Present" : exp.endDate}</span>
                                 {exp.location && <span className="block italic text-[11px]">{exp.location}</span>}
                               </div>
@@ -554,7 +800,7 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
                               <span className="font-bold text-black">{edu.degree}</span>
                               <div className="text-brand-gray-800 font-semibold">{edu.institution}</div>
                             </div>
-                            <div className="text-xs text-brand-gray-600 sm:text-right font-medium">
+                            <div className="text-xs text-brand-gray-650 sm:text-right font-medium">
                               <span>{edu.startDate} – {edu.endDate}</span>
                               {edu.location && <span className="block italic text-[11px]">{edu.location}</span>}
                             </div>
