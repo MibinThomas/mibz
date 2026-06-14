@@ -41,6 +41,7 @@ const emptyCVData: CVData = {
     linkedinUrl: "",
     portfolioUrl: "",
     githubUrl: "",
+    profileImage: "",
   },
   summary: "",
   experience: [],
@@ -307,7 +308,7 @@ export default function CVMakerPage() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${watchedValues.personalInfo.fullName || "Resume"} - CV</title>
+  <title>${watchedValues.personalInfo?.fullName || "Resume"} - CV</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -818,8 +819,8 @@ export default function CVMakerPage() {
                 {/* WORKSPACE CONTENT GRID */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                   
-                  {/* LEFT / EDIT FORM COLUMN */}
-                  <div className={`lg:col-span-5 space-y-6 ${mobileTab === "edit" ? "block" : "hidden lg:block"}`}>
+                  {/* LEFT / EDIT & STYLE CUSTOMIZER COLUMN */}
+                  <div className={`lg:col-span-8 space-y-6 ${mobileTab === "edit" ? "block" : "hidden lg:block"}`}>
                     
                     {/* Template styles */}
                     <TemplateSelector config={styleConfig} onChange={setStyleConfig} />
@@ -832,25 +833,30 @@ export default function CVMakerPage() {
                     </FormProvider>
                   </div>
 
-                  {/* CENTER / PREVIEW COLUMN */}
-                  <div className={`lg:col-span-4 lg:sticky lg:top-24 space-y-4 max-h-[85vh] overflow-y-auto no-scrollbar pr-1 ${mobileTab === "preview" ? "block" : "hidden lg:block"}`}>
-                    <div className="hidden lg:flex items-center justify-between border-b border-brand-gray-800 pb-2">
-                      <span className="text-[10px] font-semibold text-brand-gray-400 tracking-wider uppercase flex items-center gap-1.5">
-                        <Eye className="w-4 h-4 text-brand-emerald" /> Live A4 Preview
-                      </span>
-                      <span className="text-[9px] font-mono text-brand-gray-500">
-                        Standard Letter / A4 Print
-                      </span>
+                  {/* RIGHT / OUTPUT SIDEBAR (PREVIEW & ATS) */}
+                  <div className={`lg:col-span-4 lg:sticky lg:top-24 space-y-6 max-h-[85vh] overflow-y-auto no-scrollbar pr-1 ${mobileTab === "preview" || mobileTab === "ats" ? "block" : "hidden lg:block"}`}>
+                    
+                    {/* ATS Score (Stacked at top on desktop, or under ats tab on mobile) */}
+                    <div className={mobileTab === "ats" ? "block" : "hidden lg:block"}>
+                      <ATSScoreChecker 
+                        data={watchedValues}
+                        onHighlightMissingFields={setHighlightMissing}
+                      />
                     </div>
-                    <CVPreview data={watchedValues} styleConfig={styleConfig} />
-                  </div>
+                    
+                    {/* Live Preview (Stacked below ATS on desktop, or under preview tab on mobile) */}
+                    <div className={mobileTab === "preview" ? "block" : "hidden lg:block"}>
+                      <div className="hidden lg:flex items-center justify-between border-b border-brand-gray-800 pb-2 mb-3">
+                        <span className="text-[10px] font-semibold text-brand-gray-400 tracking-wider uppercase flex items-center gap-1.5">
+                          <Eye className="w-4 h-4 text-brand-emerald" /> Live A4 Preview
+                        </span>
+                        <span className="text-[9px] font-mono text-brand-gray-500">
+                          Standard Letter / A4 Print
+                        </span>
+                      </div>
+                      <CVPreview data={watchedValues} styleConfig={styleConfig} />
+                    </div>
 
-                  {/* RIGHT / ATS SCORE PANEL */}
-                  <div className={`lg:col-span-3 lg:sticky lg:top-24 ${mobileTab === "ats" ? "block" : "hidden lg:block"}`}>
-                    <ATSScoreChecker 
-                      data={watchedValues}
-                      onHighlightMissingFields={setHighlightMissing}
-                    />
                   </div>
 
                 </div>

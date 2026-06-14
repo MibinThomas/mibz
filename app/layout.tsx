@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Outfit, Poppins, Lora } from "next/font/google";
 import "./globals.css";
 import FloatingContactDial from "@/components/FloatingContactDial";
 
@@ -12,6 +12,21 @@ const inter = Inter({
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
+  display: "swap",
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
+const lora = Lora({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-lora",
   display: "swap",
 });
 
@@ -73,7 +88,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} scroll-smooth`}>
+    <html lang="en" className={`${inter.variable} ${outfit.variable} ${poppins.variable} ${lora.variable} scroll-smooth`}>
       <body className="font-sans bg-brand-dark text-foreground antialiased selection:bg-brand-emerald/30 selection:text-brand-emerald">
         <a href="#main-content" className="skip-link font-heading font-semibold rounded-br-md">
           Skip to main content

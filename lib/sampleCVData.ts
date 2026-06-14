@@ -9,7 +9,8 @@ export const sampleCVData: CVData = {
     location: "Dubai, UAE",
     linkedinUrl: "https://www.linkedin.com/in/mibin-thomas/",
     portfolioUrl: "https://mibinthomas.com",
-    githubUrl: "https://github.com/mibinthomas"
+    githubUrl: "https://github.com/mibinthomas",
+    profileImage: ""
   },
   summary: "Results-driven Growth Marketer and Web Developer with over 6 years of experience scaling e-commerce brands in the UAE and GCC region. Spearheaded paid advertising campaigns across Meta, Google, and TikTok that generated over $15M in tracked revenue. Combining deep technical expertise in Next.js and full-stack integration with data-driven CRO strategies to optimize funnel conversion rates and lower acquisition costs.",
   experience: [

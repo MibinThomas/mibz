@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { CVData, CVStyleConfig } from "../../types/cv";
 
 interface CVPreviewProps {
@@ -57,6 +57,38 @@ const accentHex: Record<CVStyleConfig["accentColor"], string> = {
 };
 
 export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
+  const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (!containerRef.current) return;
+      const parentWidth = containerRef.current.parentElement?.clientWidth || 0;
+      if (parentWidth < 800) {
+        setScale(parentWidth / 800);
+      } else {
+        setScale(1);
+      }
+    };
+    
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    const observer = new MutationObserver(handleResize);
+    if (containerRef.current?.parentElement) {
+      observer.observe(containerRef.current.parentElement, { attributes: true, childList: true, subtree: true });
+    }
+
+    // Run again on window load to ensure accurate measurements
+    const loadTimeout = setTimeout(handleResize, 100);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
+      clearTimeout(loadTimeout);
+    };
+  }, []);
+
   const { templateId, fontFamily, fontSize, spacing, accentColor } = styleConfig;
 
   const fontStyle = { fontFamily: fontFamilies[fontFamily] };
@@ -84,10 +116,19 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
   };
 
   return (
-    <div className="relative w-full max-w-[800px] mx-auto shadow-2xl transition-all duration-300">
-      
-      {/* 
-        Print Styling Override Injector
+    <div ref={containerRef} className="w-full overflow-hidden flex justify-center items-start transition-all duration-300" style={{ height: scale < 1 ? `${1050 * scale + 10}px` : "auto" }}>
+      <div 
+        className="relative shadow-2xl transition-all duration-300" 
+        style={{ 
+          transform: scale < 1 ? `scale(${scale})` : "none",
+          transformOrigin: "top center",
+          width: "800px",
+          minWidth: "800px",
+        }}
+      >
+        
+        {/* 
+          Print Styling Override Injector
         Ensures that when printing, ONLY this element takes the page width,
         with pure black text on white background and high contrast layouts.
       */}
@@ -127,6 +168,8 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
             background: #ffffff !important;
             color: #000000 !important;
             page-break-after: avoid !important;
+            transform: none !important;
+            transform-origin: initial !important;
           }
           
           /* Keep text clean and crisp */
@@ -156,7 +199,7 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
           {/* 1. Classic Professional: Centered Profile */}
           {templateId === "classic" && (
             <div className="text-center space-y-2">
-              {data.personalInfo.profileImage && (
+              {data.personalInfo?.profileImage && (
                 <div className="flex justify-center mb-2">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
@@ -167,24 +210,24 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
                 </div>
               )}
               <h1 className={`${sizeClasses.h1} font-bold tracking-tight text-black`}>
-                {data.personalInfo.fullName || "Your Full Name"}
+                {data.personalInfo?.fullName || "Your Full Name"}
               </h1>
               <div className="text-xs uppercase tracking-wider font-semibold text-brand-gray-650">
-                {data.personalInfo.jobTitle || "Job Title / Profession"}
+                {data.personalInfo?.jobTitle || "Job Title / Profession"}
               </div>
               <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-xs text-brand-gray-650">
-                {data.personalInfo.email && <span>{data.personalInfo.email}</span>}
-                {data.personalInfo.phone && <span>• {data.personalInfo.phone}</span>}
-                {data.personalInfo.location && <span>• {data.personalInfo.location}</span>}
+                {data.personalInfo?.email && <span>{data.personalInfo.email}</span>}
+                {data.personalInfo?.phone && <span>• {data.personalInfo.phone}</span>}
+                {data.personalInfo?.location && <span>• {data.personalInfo.location}</span>}
               </div>
               <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-xs text-brand-gray-600 font-medium">
-                {data.personalInfo.linkedinUrl && (
+                {data.personalInfo?.linkedinUrl && (
                   <span className="underline">{data.personalInfo.linkedinUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>
                 )}
-                {data.personalInfo.portfolioUrl && (
+                {data.personalInfo?.portfolioUrl && (
                   <span className="underline">{data.personalInfo.portfolioUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>
                 )}
-                {data.personalInfo.githubUrl && (
+                {data.personalInfo?.githubUrl && (
                   <span className="underline">{data.personalInfo.githubUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>
                 )}
               </div>
@@ -196,7 +239,7 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
           {templateId === "minimal" && (
             <div className="border-b border-brand-gray-300 pb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex items-center gap-4">
-                {data.personalInfo.profileImage && (
+                {data.personalInfo?.profileImage && (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img 
                     src={data.personalInfo.profileImage} 
@@ -206,23 +249,23 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
                 )}
                 <div className="space-y-1">
                   <h1 className={`${sizeClasses.h1} font-bold tracking-tight text-black`}>
-                    {data.personalInfo.fullName || "Your Full Name"}
+                    {data.personalInfo?.fullName || "Your Full Name"}
                   </h1>
                   <div className="text-sm font-semibold tracking-wide" style={{ color: accentColorHex }}>
-                    {data.personalInfo.jobTitle || "Job Title / Profession"}
+                    {data.personalInfo?.jobTitle || "Job Title / Profession"}
                   </div>
                 </div>
               </div>
               <div className="text-xs text-brand-gray-650 space-y-0.5 md:text-right">
-                {data.personalInfo.email && <div className="font-medium">{data.personalInfo.email}</div>}
-                {(data.personalInfo.phone || data.personalInfo.location) && (
-                  <div>{data.personalInfo.phone} | {data.personalInfo.location}</div>
+                {data.personalInfo?.email && <div className="font-medium">{data.personalInfo.email}</div>}
+                {(data.personalInfo?.phone || data.personalInfo?.location) && (
+                  <div>{data.personalInfo?.phone} | {data.personalInfo?.location}</div>
                 )}
                 <div className="flex flex-wrap md:justify-end gap-x-2 gap-y-0.5 font-medium">
-                  {data.personalInfo.linkedinUrl && (
+                  {data.personalInfo?.linkedinUrl && (
                     <span className="underline">{data.personalInfo.linkedinUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>
                   )}
-                  {data.personalInfo.portfolioUrl && (
+                  {data.personalInfo?.portfolioUrl && (
                     <span className="underline">{data.personalInfo.portfolioUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>
                   )}
                 </div>
@@ -235,7 +278,7 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
             <div className="space-y-3 pb-3 border-b-2" style={{ borderColor: accentColorHex }}>
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex gap-4 items-start">
-                  {data.personalInfo.profileImage && (
+                  {data.personalInfo?.profileImage && (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img 
                       src={data.personalInfo.profileImage} 
@@ -246,24 +289,24 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
                   )}
                   <div className="space-y-1.5">
                     <h1 className={`${sizeClasses.h1} font-bold text-black uppercase tracking-wide`}>
-                      {data.personalInfo.fullName || "Your Full Name"}
+                      {data.personalInfo?.fullName || "Your Full Name"}
                     </h1>
                     <h2 className="text-xs uppercase tracking-widest font-semibold text-brand-gray-650">
-                      {data.personalInfo.jobTitle || "Job Title / Profession"}
+                      {data.personalInfo?.jobTitle || "Job Title / Profession"}
                     </h2>
                   </div>
                 </div>
                 <div className="text-xs text-brand-gray-600 md:text-right space-y-1">
-                  {data.personalInfo.email && <div>Email: <span className="font-semibold text-black">{data.personalInfo.email}</span></div>}
-                  {data.personalInfo.phone && <div>Phone: <span className="font-semibold text-black">{data.personalInfo.phone}</span></div>}
-                  {data.personalInfo.location && <div>Location: <span className="font-semibold text-black">{data.personalInfo.location}</span></div>}
+                  {data.personalInfo?.email && <div>Email: <span className="font-semibold text-black">{data.personalInfo.email}</span></div>}
+                  {data.personalInfo?.phone && <div>Phone: <span className="font-semibold text-black">{data.personalInfo.phone}</span></div>}
+                  {data.personalInfo?.location && <div>Location: <span className="font-semibold text-black">{data.personalInfo.location}</span></div>}
                 </div>
               </div>
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-brand-gray-600">
-                {data.personalInfo.linkedinUrl && (
+                {data.personalInfo?.linkedinUrl && (
                   <span>LinkedIn: <span className="underline text-black">{data.personalInfo.linkedinUrl}</span></span>
                 )}
-                {data.personalInfo.portfolioUrl && (
+                {data.personalInfo?.portfolioUrl && (
                   <span>Portfolio: <span className="underline text-black">{data.personalInfo.portfolioUrl}</span></span>
                 )}
               </div>
@@ -277,30 +320,30 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
                 <div className="space-y-2 flex-grow">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                     <h1 className={`${sizeClasses.h1} font-extrabold tracking-tight text-black`}>
-                      {data.personalInfo.fullName || "Your Full Name"}
+                      {data.personalInfo?.fullName || "Your Full Name"}
                     </h1>
                     <div className="flex flex-wrap gap-x-2 text-xs font-mono text-brand-gray-600">
-                      {data.personalInfo.email && <span>{data.personalInfo.email}</span>}
-                      {data.personalInfo.phone && <span>| {data.personalInfo.phone}</span>}
+                      {data.personalInfo?.email && <span>{data.personalInfo.email}</span>}
+                      {data.personalInfo?.phone && <span>| {data.personalInfo.phone}</span>}
                     </div>
                   </div>
                   <div className="text-xs font-semibold uppercase tracking-wider text-brand-gray-650 flex flex-wrap gap-x-3 items-center">
-                    <span className="text-sm font-bold" style={{ color: accentColorHex }}>{data.personalInfo.jobTitle || "Job Title"}</span>
-                    {data.personalInfo.location && <span>• {data.personalInfo.location}</span>}
+                    <span className="text-sm font-bold" style={{ color: accentColorHex }}>{data.personalInfo?.jobTitle || "Job Title"}</span>
+                    {data.personalInfo?.location && <span>• {data.personalInfo.location}</span>}
                   </div>
                   <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-brand-gray-650 font-mono">
-                    {data.personalInfo.linkedinUrl && (
+                    {data.personalInfo?.linkedinUrl && (
                       <span>[LinkedIn: <span className="underline">{data.personalInfo.linkedinUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>]</span>
                     )}
-                    {data.personalInfo.portfolioUrl && (
+                    {data.personalInfo?.portfolioUrl && (
                       <span>[Portfolio: <span className="underline">{data.personalInfo.portfolioUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>]</span>
                     )}
-                    {data.personalInfo.githubUrl && (
+                    {data.personalInfo?.githubUrl && (
                       <span>[GitHub: <span className="underline">{data.personalInfo.githubUrl.replace(/^https?:\/\/(www\.)?/, "")}</span>]</span>
                     )}
                   </div>
                 </div>
-                {data.personalInfo.profileImage && (
+                {data.personalInfo?.profileImage && (
                   <div className="p-1 border border-brand-gray-350 font-mono text-[9px] flex flex-col items-center gap-1 flex-shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
@@ -319,7 +362,7 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
           {templateId === "marketing" && (
             <div className="space-y-2 pb-4 border-b border-brand-gray-300">
               <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-start">
-                {data.personalInfo.profileImage && (
+                {data.personalInfo?.profileImage && (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img 
                     src={data.personalInfo.profileImage} 
@@ -330,16 +373,16 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
                 )}
                 <div className="flex-grow space-y-2 w-full">
                   <h1 className={`${sizeClasses.h1} font-extrabold tracking-tight text-black text-left`}>
-                    {data.personalInfo.fullName || "Your Full Name"}
+                    {data.personalInfo?.fullName || "Your Full Name"}
                   </h1>
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3">
                     <div className="text-sm font-semibold tracking-wide" style={{ color: accentColorHex }}>
-                      {data.personalInfo.jobTitle || "Job Title / Profession"}
+                      {data.personalInfo?.jobTitle || "Job Title / Profession"}
                     </div>
                     <div className="text-xs text-brand-gray-600 md:text-right space-y-0.5 font-medium">
-                      {data.personalInfo.email && <div>{data.personalInfo.email}</div>}
-                      {data.personalInfo.phone && <div>{data.personalInfo.phone} • {data.personalInfo.location}</div>}
-                      {data.personalInfo.portfolioUrl && (
+                      {data.personalInfo?.email && <div>{data.personalInfo.email}</div>}
+                      {data.personalInfo?.phone && <div>{data.personalInfo.phone} • {data.personalInfo.location}</div>}
+                      {data.personalInfo?.portfolioUrl && (
                         <div className="underline text-black font-semibold">{data.personalInfo.portfolioUrl.replace(/^https?:\/\/(www\.)?/, "")}</div>
                       )}
                     </div>
@@ -571,5 +614,6 @@ export default function CVPreview({ data, styleConfig }: CVPreviewProps) {
         </div>
       </div>
     </div>
+  </div>
   );
 }
