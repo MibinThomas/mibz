@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, Check, 
-  Eye, RefreshCw, Undo, Printer, FileDown
+  Eye, RefreshCw, Undo, Printer
 } from "lucide-react";
 
 import Navbar from "@/components/Navbar";
@@ -562,27 +562,37 @@ export default function CVMakerPage() {
                 {/* MOBILE VIEW ACTIONS */}
                 <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-brand-dark/95 border-t border-brand-gray-800 p-4 z-40 flex items-center justify-between gap-3 shadow-[0_-5px_25px_rgba(0,0,0,0.5)] no-print">
                   <button
+                    type="button"
                     onClick={() => {
-                      localStorage.setItem("mibz-cv-draft", JSON.stringify(watchedValues));
-                      alert("Draft saved successfully!");
+                      if (window.confirm("Uploading another CV will clear your active workspace data. Are you sure?")) {
+                        handleUploadAnother();
+                      }
                     }}
-                    className="flex-1 h-11 border border-brand-gray-800 bg-brand-card rounded-xl text-xs font-semibold text-white"
+                    className="flex-1 h-11 border border-brand-gray-800 bg-brand-card rounded-xl text-[10px] sm:text-xs font-semibold text-brand-gray-300 hover:text-white flex items-center justify-center gap-1.5"
                   >
-                    Save Draft
+                    <Undo className="w-4 h-4 text-brand-gray-400" />
+                    <span>Upload CV</span>
                   </button>
                   <button
-                    onClick={() => setMobileTab("preview")}
-                    className="h-11 px-4 border border-brand-gray-850 bg-brand-dark rounded-xl text-brand-gray-300"
-                    title="Preview Layout"
+                    type="button"
+                    onClick={() => {
+                      setMobileTab("preview");
+                      setTimeout(() => {
+                        document.getElementById("cv-preview-sheet")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }, 150);
+                    }}
+                    className="flex-1 h-11 border border-brand-gray-850 bg-brand-dark rounded-xl text-[10px] sm:text-xs font-semibold text-brand-gray-300 hover:text-white flex items-center justify-center gap-1.5"
                   >
-                    <Eye className="w-5 h-5" />
+                    <Eye className="w-4 h-4 text-brand-blue" />
+                    <span>View Updated CV</span>
                   </button>
                   <button
+                    type="button"
                     onClick={handlePrint}
-                    className="flex-[2] h-11 bg-gradient-to-r from-brand-emerald to-brand-blue rounded-xl text-xs font-bold text-brand-dark flex items-center justify-center gap-1.5"
+                    className="flex-1 h-11 bg-gradient-to-r from-brand-emerald to-brand-blue rounded-xl text-[10px] sm:text-xs font-bold text-brand-dark flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
                   >
-                    <FileDown className="w-4.5 h-4.5" />
-                    <span>Download PDF</span>
+                    <Printer className="w-4 h-4" />
+                    <span>Download CV</span>
                   </button>
                 </div>
 
