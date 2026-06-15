@@ -423,7 +423,7 @@ export default function CVMakerPage() {
                       </button>
 
                       {showUploadAnotherConfirm && (
-                        <div className="absolute left-0 top-12 w-64 bg-brand-card border border-white/10 rounded-2xl p-4 shadow-2xl z-20 space-y-3 backdrop-blur-lg">
+                        <div className="absolute left-0 top-12 w-64 bg-brand-card border border-white/10 rounded-2xl p-4 shadow-2xl z-20 space-y-3">
                           <p className="text-xs text-brand-gray-300 leading-normal">
                             Uploading another CV will clear your active workspace data. Are you sure?
                           </p>
